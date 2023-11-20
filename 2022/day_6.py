@@ -1,4 +1,4 @@
-file = open("dev/AoC/2022/input_day_6.txt", "r")
+file = open("2022/input_day_6.txt", "r")
 while True:
     content = file.readline().rstrip()
     if not content:

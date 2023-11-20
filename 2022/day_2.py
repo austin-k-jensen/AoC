@@ -1,4 +1,4 @@
-file = open("dev/AoC/2022/input_day_2.txt", "r")
+file = open("2022/input_day_2.txt", "r")
 
 guide = {
     "A X": 1 + 3,
@@ -25,7 +25,7 @@ while True:
 
 print("part 1: ", score)
 
-file = open("dev/AoC/2022/input_day_2.txt", "r")
+file = open("2022/input_day_2.txt", "r")
 
 guide = {
     "A X": 3 + 0,

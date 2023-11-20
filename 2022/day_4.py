@@ -3,7 +3,7 @@ import re
 tot_1 = 0
 tot_2 = 0
 
-file = open("dev/AoC/2022/input_day_4.txt", "r")
+file = open("2022/input_day_4.txt", "r")
 while True:
     content = file.readline().rstrip()
     if not content:

@@ -3,7 +3,7 @@ from collections import defaultdict
 dirs = defaultdict(int)
 path = []
 
-file = open("dev/AoC/2022/input_day_7.txt", "r")
+file = open("2022/input_day_7.txt", "r")
 while True:
     content = file.readline().rstrip()
     if not content:

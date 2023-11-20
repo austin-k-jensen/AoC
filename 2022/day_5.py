@@ -12,7 +12,7 @@ stacks = {
     9: ["M", "N", "Z", "W"],
 }
 
-file = open("dev/AoC/2022/input_day_5.txt", "r")
+file = open("2022/input_day_5.txt", "r")
 while True:
     content = file.readline().rstrip()
     if not content:
@@ -42,7 +42,7 @@ stacks = {
     9: ["M", "N", "Z", "W"],
 }
 
-file = open("dev/AoC/2022/input_day_5.txt", "r")
+file = open("2022/input_day_5.txt", "r")
 while True:
     content = file.readline().rstrip()
     if not content:

@@ -1,4 +1,4 @@
-file = open("dev/AoC/2022/input_day_1.txt", "r")
+file = open("2022/input_day_1.txt", "r")
 
 elfs = {}
 items = []

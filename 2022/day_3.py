@@ -11,7 +11,7 @@ for i in alc:
 
 tot = 0
 
-file = open("dev/AoC/2022/input_day_3.txt", "r")
+file = open("2022/input_day_3.txt", "r")
 while True:
     content = file.readline().rstrip()
     if not content:
@@ -40,7 +40,7 @@ tot = 0
 cnt = 1
 bags = []
 
-file = open("dev/AoC/2022/input_day_3.txt", "r")
+file = open("2022/input_day_3.txt", "r")
 while True:
     content = file.readline().rstrip()
     if not content:
