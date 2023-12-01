@@ -5,58 +5,60 @@ import re
 YEAR, DAY = 2023, 1
 puzzle = get_data(day=DAY, year=YEAR)
 
-file = open("2023/input_day_1.txt", "r")
+test1 = """1abc2
+pqr3stu8vwx
+a1b2c3d4e5f
+treb7uchet
+"""
 
-tot = 0
+test2 = """two1nine
+eightwothree
+abcone2threexyz
+xtwone3four
+4nineeightseven2
+zoneight234
+7pqrstsixteen
+"""
 
-while True:
-    content = file.readline().rstrip()
-    if not content:
-        file.close()
-        break
-    else:
-        line = re.findall(r"\d", content)
-        tot += int(line[0] + line[-1])
-P1_ANSWER = tot
-print("part 1: ", tot)
 
-# submit(P1_ANSWER, part="a", year=YEAR, day=DAY)
+def part_1(input, submit: bool = False):
+    P1_ANSWER = 0
+    for line in iter(input.splitlines()):
+        nums = re.findall(r"\d", line)
+        P1_ANSWER += int(nums[0] + nums[-1])
+    print("part 1: ", P1_ANSWER)
 
-key = {
-    "one": "1",
-    "two": "2",
-    "three": "3",
-    "four": "4",
-    "five": "5",
-    "six": "6",
-    "seven": "7",
-    "eight": "8",
-    "nine": "9",
-}
+    if submit:
+        submit(P1_ANSWER, part="a", year=YEAR, day=DAY)
 
-tot = 0
-file = open("2023/input_day_1.txt", "r")
-while True:
-    content = file.readline().rstrip()
-    if not content:
-        file.close()
-        break
-    else:
-        line = re.findall(
-            r"(?=(\d|one|two|three|four|five|six|seven|eight|nine))",
-            content,
+
+part_1(puzzle, submit=False)
+
+
+def part_2(input, submit: bool = False):
+    key = {
+        "one": "1",
+        "two": "2",
+        "three": "3",
+        "four": "4",
+        "five": "5",
+        "six": "6",
+        "seven": "7",
+        "eight": "8",
+        "nine": "9",
+    }
+    P2_ANSWER = 0
+    for line in iter(input.splitlines()):
+        nums = re.findall(
+            r"(?=(\d|one|two|three|four|five|six|seven|eight|nine))", line
         )
-        trans = []
-        for i in line:
-            if i in key.keys():
-                trans.append(key[i])
-            else:
-                trans.append(i)
-        # print(line)
-        # print(trans)
-        # print(int(trans[0] + trans[-1]))
-        tot += int(trans[0] + trans[-1])
-print("part 2: ", tot)
-P2_ANSWER = tot
+        for i in range(len(nums)):
+            nums[i] = key[nums[i]] if nums[i] in key.keys() else nums[i]
+        P2_ANSWER += int(nums[0] + nums[-1])
+    print("part 2: ", P2_ANSWER)
 
-# submit(P2_ANSWER, part="b", year=YEAR, day=DAY)
+    if submit:
+        submit(P2_ANSWER, part="b", year=YEAR, day=DAY)
+
+
+part_2(puzzle, submit=False)
