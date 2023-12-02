@@ -1,17 +1,19 @@
-from aocd import get_data
-from aocd import submit
+"""AOC 2023 Day 1"""
 import re
+from aocd import get_data
+from aocd import submit  # pylint: disable=no-name-in-module
+
 
 YEAR, DAY = 2023, 1
 puzzle = get_data(day=DAY, year=YEAR)
 
-test1 = """1abc2
+TEST_1 = """1abc2
 pqr3stu8vwx
 a1b2c3d4e5f
 treb7uchet
 """
 
-test2 = """two1nine
+TEST_2 = """two1nine
 eightwothree
 abcone2threexyz
 xtwone3four
@@ -21,21 +23,23 @@ zoneight234
 """
 
 
-def part_1(input, submit: bool = False):
-    P1_ANSWER = 0
-    for line in iter(input.splitlines()):
+def part_1(data, sub: bool = False):
+    """Part 1 Function"""
+    p1_answer = 0
+    for line in iter(data.splitlines()):
         nums = re.findall(r"\d", line)
-        P1_ANSWER += int(nums[0] + nums[-1])
-    print("part 1: ", P1_ANSWER)
+        p1_answer += int(nums[0] + nums[-1])
+    print("part 1: ", p1_answer)
 
-    if submit:
-        submit(P1_ANSWER, part="a", year=YEAR, day=DAY)
-
-
-part_1(puzzle, submit=False)
+    if sub:
+        submit(p1_answer, part="a", year=YEAR, day=DAY)
 
 
-def part_2(input, submit: bool = False):
+part_1(puzzle, sub=False)
+
+
+def part_2(data, sub: bool = False):
+    """Part 2 Function"""
     key = {
         "one": "1",
         "two": "2",
@@ -47,18 +51,18 @@ def part_2(input, submit: bool = False):
         "eight": "8",
         "nine": "9",
     }
-    P2_ANSWER = 0
-    for line in iter(input.splitlines()):
+    p2_answer = 0
+    for line in iter(data.splitlines()):
         nums = re.findall(
             r"(?=(\d|one|two|three|four|five|six|seven|eight|nine))", line
         )
-        for i in range(len(nums)):
-            nums[i] = key[nums[i]] if nums[i] in key.keys() else nums[i]
-        P2_ANSWER += int(nums[0] + nums[-1])
-    print("part 2: ", P2_ANSWER)
+        for i in enumerate(nums):
+            nums[i[0]] = key[nums[i[0]]] if nums[i[0]] in key else nums[i[0]]
+        p2_answer += int(nums[0] + nums[-1])
+    print("part 2: ", p2_answer)
 
-    if submit:
-        submit(P2_ANSWER, part="b", year=YEAR, day=DAY)
+    if sub:
+        submit(p2_answer, part="b", year=YEAR, day=DAY)
 
 
-part_2(puzzle, submit=False)
+part_2(puzzle, sub=False)
