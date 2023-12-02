@@ -1,5 +1,4 @@
 from aocd import get_data
-from aocd import submit
 import re
 
 YEAR, DAY = 2022, 10
@@ -162,47 +161,50 @@ test = """
 
 # program  = [(dir, int(dist or 0)) for (dir, dist) in re.findall(r'([A-Za-z]{4}) ?(-?\d+)?', small)]
 # program  = [(dir, int(dist or 0)) for (dir, dist) in re.findall(r'([A-Za-z]{4}) ?(-?\d+)?', test)]
-program  = [(dir, int(dist or 0)) for (dir, dist) in re.findall(r'([A-Za-z]{4}) ?(-?\d+)?', puzzle)]
+program = [
+    (dir, int(dist or 0))
+    for (dir, dist) in re.findall(r"([A-Za-z]{4}) ?(-?\d+)?", puzzle)
+]
 
-record = [(0,1)]
+record = [(0, 1)]
 cycle = 0
 signal = 1
 
 for line in program:
     # print(line)
-    if line[0] == 'noop':
-        cycle+=1
-        record.append((cycle,signal))
+    if line[0] == "noop":
+        cycle += 1
+        record.append((cycle, signal))
     if line[0] == "addx":
-        cycle+=1
-        record.append((cycle,signal))
-        cycle+=1
-        record.append((cycle,signal))
-        signal+=line[1]
+        cycle += 1
+        record.append((cycle, signal))
+        cycle += 1
+        record.append((cycle, signal))
+        signal += line[1]
     # print(record)
 
 P1_ANSWER = 0
-for i in range(20,221,40):
-    P1_ANSWER+=(record[i][0]*record[i][1])
+for i in range(20, 221, 40):
+    P1_ANSWER += record[i][0] * record[i][1]
 print(P1_ANSWER)
 
 record.pop(0)
-crt = ''
+crt = ""
 mod = 0
 for i in record:
     print(i)
-    if i[0]%40 == 0:
-        mod+=40
+    if i[0] % 40 == 0:
+        mod += 40
 
-    if (i[1]-1) <= (i[0]-1-mod) <= (i[1]+1):
-        crt+='#'
-        print('#')
+    if (i[1] - 1) <= (i[0] - 1 - mod) <= (i[1] + 1):
+        crt += "#"
+        print("#")
     else:
-        crt+='.'
-        print('.')
+        crt += "."
+        print(".")
 
-    if i[0]%40 == 0:
-        crt+='\n'
+    if i[0] % 40 == 0:
+        crt += "\n"
 print(crt)
 
 # submit(P1_ANSWER, part="a", year=YEAR, day=DAY)

@@ -33,4 +33,4 @@ def part_2(data, sub: bool = False):
         submit(p2_answer, part="b", year=YEAR, day=DAY)
 
 
-part_2(TEST_1, sub=False)
+# part_2(TEST_1, sub=False)
