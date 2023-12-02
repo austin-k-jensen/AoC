@@ -15,55 +15,26 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
 
 def part_1(input, sub: bool = False):
     P1_ANSWER = 0
-    for line in iter(input.splitlines()):
-        game = re.findall(r"(\d+):", line)
-        draws = re.findall(r"(\d+) ([rbg])", line)
-
-        for draw in draws:
-            if (
-                (draw[1] == "r" and int(draw[0]) > 12)
-                or (draw[1] == "g" and int(draw[0]) > 13)
-                or (draw[1] == "b" and int(draw[0]) > 14)
-            ):
-                game[0] = 0
-
-        P1_ANSWER += int(game[0])
-
-    print("part 1: ", P1_ANSWER)
-
-    if sub:
-        submit(P1_ANSWER, part="a", year=YEAR, day=DAY)
-
-
-part_1(puzzle, sub=False)
-
-
-def part_2(input, sub: bool = False):
     P2_ANSWER = 0
     for line in iter(input.splitlines()):
-        draws = re.findall(r"(\d+) ([rbg])", line)
+        game = int(re.findall(r"(\d+):", line)[0])
+        r = max([int(cube) for cube in re.findall(r"(\d+) r", line)])
+        b = max([int(cube) for cube in re.findall(r"(\d+) b", line)])
+        g = max([int(cube) for cube in re.findall(r"(\d+) g", line)])
 
-        r_max = 0
-        b_max = 0
-        g_max = 0
+        if r > 12 or g > 13 or b > 14:
+            pass
+        else:
+            P1_ANSWER += game
 
-        for draw in draws:
-            if draw[1] == "r":
-                if int(draw[0]) > r_max:
-                    r_max = int(draw[0])
-            if draw[1] == "b":
-                if int(draw[0]) > b_max:
-                    b_max = int(draw[0])
-            if draw[1] == "g":
-                if int(draw[0]) > g_max:
-                    g_max = int(draw[0])
+        P2_ANSWER += r * b * g
 
-        P2_ANSWER += r_max * b_max * g_max
-
+    print("part 1: ", P1_ANSWER)
     print("part 2: ", P2_ANSWER)
 
     if sub:
+        submit(P1_ANSWER, part="a", year=YEAR, day=DAY)
         submit(P2_ANSWER, part="b", year=YEAR, day=DAY)
 
 
-part_2(puzzle, sub=False)
+part_1(puzzle, sub=False)
