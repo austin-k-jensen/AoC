@@ -1,7 +1,7 @@
 """AOC 2023 Day 1"""
 import re
 from aocd import get_data
-from aocd import submit  # pylint: disable=no-name-in-module
+from aocd import submit
 
 
 YEAR, DAY = 2023, 1
