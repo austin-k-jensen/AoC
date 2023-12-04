@@ -14,21 +14,25 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
 """
 
 
+def parse(data):
+    cards = {}
+    for line in iter(data.splitlines()):
+        game = int(re.findall(r"(\d+):", line)[0])
+        cards[game] = {"cnt": 1, "matchs": 0}
+        card = line.split(":")[1].split("|")
+        win = card[0].split()
+        nums = card[1].split()
+
+        cards[game]["matchs"] += len(set(nums).intersection(win))
+
+    return cards
+
+
 def part_1(data, sub: bool = False):
     p1_answer = 0
-    for line in iter(data.splitlines()):
-        card = line.split(":")[1].split("|")
-        win = card[0].split(" ")
-        nums = card[1].split(" ")
-        while "" in win:
-            win.remove("")
-        while "" in nums:
-            nums.remove("")
-
-        result = set(nums).intersection(win)
-        matchs = len(result)
-        if matchs != 0:
-            p1_answer += 2 ** (matchs - 1)
+    for card in data:
+        if data[card]["matchs"] != 0:
+            p1_answer += 2 ** (data[card]["matchs"] - 1)
 
     print("part 1: ", p1_answer)
 
@@ -36,31 +40,12 @@ def part_1(data, sub: bool = False):
         submit(p1_answer, part="a", year=YEAR, day=DAY)
 
 
-part_1(puzzle, sub=False)
-
-
 def part_2(data, sub: bool = False):
     p2_answer = 0
-    cards = {}
-    for line in iter(data.splitlines()):
-        game = int(re.findall(r"(\d+):", line)[0])
-        cards[game] = {"cnt": 1, "matchs": 0}
-        card = line.split(":")[1].split("|")
-        win = card[0].split(" ")
-        nums = card[1].split(" ")
-        while "" in win:
-            win.remove("")
-        while "" in nums:
-            nums.remove("")
-
-        result = set(nums).intersection(win)
-        matchs = len(result)
-        cards[game]["matchs"] += matchs
-
-    for card in cards:
-        for i in range(card + 1, card + cards[card]["matchs"] + 1):
-            cards[i]["cnt"] += 1 * cards[card]["cnt"]
-        p2_answer += cards[card]["cnt"]
+    for card in data:
+        for i in range(card + 1, card + data[card]["matchs"] + 1):
+            data[i]["cnt"] += 1 * data[card]["cnt"]
+        p2_answer += data[card]["cnt"]
 
     print("part 2: ", p2_answer)
 
@@ -68,4 +53,6 @@ def part_2(data, sub: bool = False):
         submit(p2_answer, part="b", year=YEAR, day=DAY)
 
 
-part_2(puzzle, sub=False)
+cards = parse(puzzle)
+part_1(cards, sub=False)
+part_2(cards, sub=False)
