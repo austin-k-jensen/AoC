@@ -68,4 +68,4 @@ def part_2(data, sub: bool = False):
         submit(p2_answer, part="b", year=YEAR, day=DAY)
 
 
-part_2(puzzle, sub=True)
+part_2(puzzle, sub=False)
