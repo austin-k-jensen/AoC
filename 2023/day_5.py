@@ -140,27 +140,36 @@ def part_2(seeds, mapping, sub: bool = False):
 
 def part_2_rev(seeds, mapping, sub: bool = False):
     scriptstart = datetime.now()
-    min_loc = 999999999999999
-
+    # min_loc = 999999999999999
+    seed_ranges = []
     for i in range(0, len(seeds), 2):
-        for seed in range(seeds[i], seeds[i] + seeds[i + 1]):
-            for step in mapping:
-                for pair in step:
-                    if pair[1][0] <= seed <= pair[1][1]:
-                        seed = pair[0][0] + seed - pair[1][0]
-                        break
-                    else:
-                        pass
-            min_loc = seed if seed < min_loc else min_loc
+        seed_ranges.append([seeds[i], seeds[i] + seeds[i + 1] - 1])
 
-    scriptend = datetime.now()
-    elapsed = scriptend - scriptstart
-    elapsed_sec = elapsed.seconds
-    print(f"\n{scriptend}: Part 2 complete in seconds: {elapsed_sec}")
-    print("part 2: ", min_loc)
+    found = False
+    loc = 0
+
+    while not found:
+        test_loc = loc
+        for step in reversed(mapping):
+            for pair in step:
+                if pair[0][0] <= test_loc <= pair[0][1]:
+                    test_loc = pair[1][0] + test_loc - pair[0][0]
+                    break
+
+        for seed_range in seed_ranges:
+            if seed_range[0] <= test_loc <= seed_range[1]:
+                found = True
+
+                scriptend = datetime.now()
+                elapsed = scriptend - scriptstart
+                elapsed_sec = elapsed.seconds
+                print(f"\n{scriptend}: Part 2 complete in seconds: {elapsed_sec}")
+                print("part 2: ", loc)
+
+        loc += 1
 
 
-seeds, mapping = parse(TEST_1)
+seeds, mapping = parse(puzzle)
 part_1(seeds, mapping, sub=False)
 # part_2(seeds, mapping, sub=False)
 part_2_rev(seeds, mapping, sub=False)
