@@ -118,29 +118,6 @@ def part_1(seeds, mapping, sub: bool = False):
 
 def part_2(seeds, mapping, sub: bool = False):
     scriptstart = datetime.now()
-    min_loc = 999999999999999
-
-    for i in range(0, len(seeds), 2):
-        for seed in range(seeds[i], seeds[i] + seeds[i + 1]):
-            for step in mapping:
-                for pair in step:
-                    if pair[1][0] <= seed <= pair[1][1]:
-                        seed = pair[0][0] + seed - pair[1][0]
-                        break
-                    else:
-                        pass
-            min_loc = seed if seed < min_loc else min_loc
-
-    scriptend = datetime.now()
-    elapsed = scriptend - scriptstart
-    elapsed_sec = elapsed.seconds
-    print(f"\n{scriptend}: Part 2 complete in seconds: {elapsed_sec}")
-    print("part 2: ", min_loc)
-
-
-def part_2_rev(seeds, mapping, sub: bool = False):
-    scriptstart = datetime.now()
-    # min_loc = 999999999999999
     seed_ranges = []
     for i in range(0, len(seeds), 2):
         seed_ranges.append([seeds[i], seeds[i] + seeds[i + 1] - 1])
@@ -171,5 +148,4 @@ def part_2_rev(seeds, mapping, sub: bool = False):
 
 seeds, mapping = parse(puzzle)
 part_1(seeds, mapping, sub=False)
-# part_2(seeds, mapping, sub=False)
-part_2_rev(seeds, mapping, sub=False)
+part_2(seeds, mapping, sub=False)
