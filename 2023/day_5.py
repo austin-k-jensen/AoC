@@ -50,33 +50,40 @@ def parse(data):
     seeds = [int(seed) for seed in re.findall(r"(\d+)", sections[0])]
 
     seed_to_soil = [
-        [(int(seed), int(seed) + int(num) - 1), (int(soil), int(soil) + int(num) - 1)]
+        [(int(soil), int(soil) + int(num) - 1), (int(seed), int(seed) + int(num) - 1)]
         for seed, soil, num in re.findall(r"(\d+) (\d+) (\d+)", sections[1])
     ]
+    seed_to_soil.sort()
     soil_to_fertilizer = [
-        [(int(seed), int(seed) + int(num) - 1), (int(soil), int(soil) + int(num) - 1)]
+        [(int(soil), int(soil) + int(num) - 1), (int(seed), int(seed) + int(num) - 1)]
         for seed, soil, num in re.findall(r"(\d+) (\d+) (\d+)", sections[2])
     ]
+    soil_to_fertilizer.sort()
     fertilizer_to_water = [
-        [(int(seed), int(seed) + int(num) - 1), (int(soil), int(soil) + int(num) - 1)]
+        [(int(soil), int(soil) + int(num) - 1), (int(seed), int(seed) + int(num) - 1)]
         for seed, soil, num in re.findall(r"(\d+) (\d+) (\d+)", sections[3])
     ]
+    fertilizer_to_water.sort()
     water_to_light = [
-        [(int(seed), int(seed) + int(num) - 1), (int(soil), int(soil) + int(num) - 1)]
+        [(int(soil), int(soil) + int(num) - 1), (int(seed), int(seed) + int(num) - 1)]
         for seed, soil, num in re.findall(r"(\d+) (\d+) (\d+)", sections[4])
     ]
+    water_to_light.sort()
     light_to_temperature = [
-        [(int(seed), int(seed) + int(num) - 1), (int(soil), int(soil) + int(num) - 1)]
+        [(int(soil), int(soil) + int(num) - 1), (int(seed), int(seed) + int(num) - 1)]
         for seed, soil, num in re.findall(r"(\d+) (\d+) (\d+)", sections[5])
     ]
+    light_to_temperature.sort()
     temperature_to_humidity = [
-        [(int(seed), int(seed) + int(num) - 1), (int(soil), int(soil) + int(num) - 1)]
+        [(int(soil), int(soil) + int(num) - 1), (int(seed), int(seed) + int(num) - 1)]
         for seed, soil, num in re.findall(r"(\d+) (\d+) (\d+)", sections[6])
     ]
+    temperature_to_humidity.sort()
     humidity_to_location = [
-        [(int(seed), int(seed) + int(num) - 1), (int(soil), int(soil) + int(num) - 1)]
+        [(int(soil), int(soil) + int(num) - 1), (int(seed), int(seed) + int(num) - 1)]
         for seed, soil, num in re.findall(r"(\d+) (\d+) (\d+)", sections[7])
     ]
+    humidity_to_location.sort()
 
     mapping = [
         seed_to_soil,
@@ -96,7 +103,7 @@ def parse(data):
     return seeds, mapping
 
 
-def part_1(seeds, mapping, sub: bool = False):
+def part_1(seeds, mapping):
     scriptstart = datetime.now()
     locs = []
     for seed in seeds:
@@ -116,7 +123,7 @@ def part_1(seeds, mapping, sub: bool = False):
     print("part 1: ", min(locs))
 
 
-def part_2(seeds, mapping, sub: bool = False):
+def part_2(seeds, mapping):
     scriptstart = datetime.now()
     seed_ranges = []
     for i in range(0, len(seeds), 2):
@@ -146,6 +153,43 @@ def part_2(seeds, mapping, sub: bool = False):
         loc += 1
 
 
-seeds, mapping = parse(puzzle)
-part_1(seeds, mapping, sub=False)
-part_2(seeds, mapping, sub=False)
+def part_2_new(seeds, mapping):
+    scriptstart = datetime.now()
+    seed_ranges = []
+    for i in range(0, len(seeds), 2):
+        seed_ranges.append([seeds[i], seeds[i] + seeds[i + 1] - 1])
+    seed_ranges.sort()
+    print(seed_ranges)
+
+    for step in mapping[0:2]:
+        print(step)
+        new_ranges = []
+        for seed_range in seed_ranges:
+            for pair in step:
+                print(pair, seed_range)
+                if seed_range[1] < pair[0][0]:
+                    pass
+                elif seed_range[0] >= pair[0][0] and seed_range[1] <= pair[0][1]:
+                    new_ranges.append(
+                        [
+                            pair[1][0] + seed_range[0] - pair[0][0],
+                            pair[1][1] + seed_range[1] - pair[0][1],
+                        ]
+                    )
+                elif seed_range[0] > pair[0][1]:
+                    new_ranges.append(seed_range)
+                    # seed_ranges.remove(seed_range)
+            seed_ranges = new_ranges
+        print(seed_ranges)
+
+    scriptend = datetime.now()
+    elapsed = scriptend - scriptstart
+    elapsed_sec = elapsed.seconds
+    print(f"\n{scriptend}: Part 2 complete in seconds: {elapsed_sec}")
+    # print("part 2: ", loc)
+
+
+seeds, mapping = parse(TEST_1)
+# part_1(seeds, mapping)
+# part_2(seeds, mapping)
+part_2_new(seeds, mapping)
