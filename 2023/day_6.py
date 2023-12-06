@@ -10,14 +10,11 @@ Distance:  9  40  200
 """
 
 
-def parse(data):
+def part_1(data):
     lines = data.splitlines()
     times = [int(time) for time in re.findall(r"(\d+)", lines[0])]
     dists = [int(dist) for dist in re.findall(r"(\d+)", lines[1])]
-    return times, dists
 
-
-def part_1(times, dists):
     tot = 1
     for i in range(len(times)):
         race = 0
@@ -25,22 +22,20 @@ def part_1(times, dists):
             if dists[i] < j * (times[i] - j):
                 race += 1
         tot *= race
-    print(tot)
+    print("part 1: ", tot)
 
 
-def part_2(times, dists):
-    times = [str(i) for i in times]
-    time = int("".join(times))
-    dists = [str(i) for i in dists]
-    dist = int("".join(dists))
+def part_2(data):
+    lines = data.splitlines()
+    time = int("".join(re.findall(r"(\d+)", lines[0])))
+    dist = int("".join(re.findall(r"(\d+)", lines[1])))
 
     race = 0
     for j in range(time + 1):
         if dist < j * (time - j):
             race += 1
-    print(race)
+    print("part 2 ", race)
 
 
-times, dists = parse(puzzle)
-part_1(times, dists)
-part_2(times, dists)
+part_1(puzzle)
+part_2(puzzle)

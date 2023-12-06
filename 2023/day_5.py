@@ -1,7 +1,6 @@
 import re
 from datetime import datetime
 from aocd import get_data
-from aocd import submit
 
 YEAR, DAY = 2023, 5
 puzzle = get_data(day=DAY, year=YEAR)
@@ -49,51 +48,17 @@ def parse(data):
 
     seeds = [int(seed) for seed in re.findall(r"(\d+)", sections[0])]
 
-    seed_to_soil = [
-        [(int(soil), int(soil) + int(num) - 1), (int(seed), int(seed) + int(num) - 1)]
-        for seed, soil, num in re.findall(r"(\d+) (\d+) (\d+)", sections[1])
-    ]
-    seed_to_soil.sort()
-    soil_to_fertilizer = [
-        [(int(soil), int(soil) + int(num) - 1), (int(seed), int(seed) + int(num) - 1)]
-        for seed, soil, num in re.findall(r"(\d+) (\d+) (\d+)", sections[2])
-    ]
-    soil_to_fertilizer.sort()
-    fertilizer_to_water = [
-        [(int(soil), int(soil) + int(num) - 1), (int(seed), int(seed) + int(num) - 1)]
-        for seed, soil, num in re.findall(r"(\d+) (\d+) (\d+)", sections[3])
-    ]
-    fertilizer_to_water.sort()
-    water_to_light = [
-        [(int(soil), int(soil) + int(num) - 1), (int(seed), int(seed) + int(num) - 1)]
-        for seed, soil, num in re.findall(r"(\d+) (\d+) (\d+)", sections[4])
-    ]
-    water_to_light.sort()
-    light_to_temperature = [
-        [(int(soil), int(soil) + int(num) - 1), (int(seed), int(seed) + int(num) - 1)]
-        for seed, soil, num in re.findall(r"(\d+) (\d+) (\d+)", sections[5])
-    ]
-    light_to_temperature.sort()
-    temperature_to_humidity = [
-        [(int(soil), int(soil) + int(num) - 1), (int(seed), int(seed) + int(num) - 1)]
-        for seed, soil, num in re.findall(r"(\d+) (\d+) (\d+)", sections[6])
-    ]
-    temperature_to_humidity.sort()
-    humidity_to_location = [
-        [(int(soil), int(soil) + int(num) - 1), (int(seed), int(seed) + int(num) - 1)]
-        for seed, soil, num in re.findall(r"(\d+) (\d+) (\d+)", sections[7])
-    ]
-    humidity_to_location.sort()
-
-    mapping = [
-        seed_to_soil,
-        soil_to_fertilizer,
-        fertilizer_to_water,
-        water_to_light,
-        light_to_temperature,
-        temperature_to_humidity,
-        humidity_to_location,
-    ]
+    mapping = []
+    for section in sections[1:]:
+        mp = [
+            [
+                [int(start), int(start) + int(num)],
+                [int(target), int(target) + int(num)],
+            ]
+            for target, start, num in re.findall(r"(\d+) (\d+) (\d+)", section)
+        ]
+        mp.sort()
+        mapping.append(mp)
 
     scriptend = datetime.now()
     elapsed = scriptend - scriptstart
@@ -109,8 +74,8 @@ def part_1(seeds, mapping):
     for seed in seeds:
         for step in mapping:
             for pair in step:
-                if pair[1][0] <= seed <= pair[1][1]:
-                    seed = pair[0][0] + seed - pair[1][0]
+                if pair[0][0] <= seed <= pair[0][1]:
+                    seed = pair[1][0] + seed - pair[0][0]
                     break
                 else:
                     pass
@@ -119,7 +84,7 @@ def part_1(seeds, mapping):
     scriptend = datetime.now()
     elapsed = scriptend - scriptstart
     elapsed_sec = elapsed.seconds
-    print(f"\n{scriptend}: Parsing complete in seconds: {elapsed_sec}")
+    print(f"\n{scriptend}: Part 1 complete in seconds: {elapsed_sec}")
     print("part 1: ", min(locs))
 
 
@@ -155,72 +120,45 @@ def part_2(seeds, mapping):
 
 def part_2_new(seeds, mapping):
     scriptstart = datetime.now()
-    seed_ranges = []
+    locations = []
     for i in range(0, len(seeds), 2):
-        seed_ranges.append([seeds[i], seeds[i] + seeds[i + 1] - 1])
-    seed_ranges.sort()
-    print(seed_ranges)
-
-    for step in mapping[0:2]:
-        print(step)
+        seed_range = [[seeds[i], seeds[i] + seeds[i + 1]]]
         new_ranges = []
-        for seed_range in seed_ranges:
-            for pair in step:
-                print(pair, seed_range)
-                if seed_range[1] < pair[0][0]:
-                    pass
-                elif seed_range[0] >= pair[0][0] and seed_range[1] <= pair[0][1]:
+
+        for step in mapping:
+            while seed_range:
+                start_range, end_range = seed_range.pop()
+                for pair in step:
+                    if pair[0][1] <= start_range or end_range <= pair[0][0]:
+                        continue
+                    if start_range < pair[0][0]:
+                        seed_range.append([start_range, pair[0][0]])
+                        start_range = pair[0][0]
+                    if pair[0][1] < end_range:
+                        seed_range.append([pair[0][1], end_range])
+                        end_range = pair[0][1]
                     new_ranges.append(
                         [
-                            pair[1][0] + seed_range[0] - pair[0][0],
-                            pair[1][1] + seed_range[1] - pair[0][1],
+                            pair[1][0] + start_range - pair[0][0],
+                            pair[1][1] + end_range - pair[0][1],
                         ]
                     )
-                elif seed_range[0] > pair[0][1]:
-                    new_ranges.append(seed_range)
-                    # seed_ranges.remove(seed_range)
-            seed_ranges = new_ranges
-        print(seed_ranges)
+                    break
+                else:
+                    new_ranges.append([start_range, end_range])
+            seed_range = new_ranges
+            new_ranges = []
+        locations += seed_range
+    min_loc = min(loc[0] for loc in locations)
 
     scriptend = datetime.now()
     elapsed = scriptend - scriptstart
     elapsed_sec = elapsed.seconds
     print(f"\n{scriptend}: Part 2 complete in seconds: {elapsed_sec}")
-    # print("part 2: ", loc)
+    print("part 2: ", min_loc)
 
 
-seeds, mapping = parse(TEST_1)
-# part_1(seeds, mapping)
+seeds, mapping = parse(puzzle)
+part_1(seeds, mapping)
 # part_2(seeds, mapping)
 part_2_new(seeds, mapping)
-
-# seeds, *maps = open('input').read().split('\n\n')
-# seeds = [int(seed) for seed in seeds.split()[1:]]
-# maps = [[list(map(int, line.split())) for line in m.splitlines()[1:]] for m in maps]
-
-# locations = []
-# for i in range(0, len(seeds), 2):
-#     ranges = [[seeds[i], seeds[i + 1] + seeds[i]]]
-#     results = []
-#     for _map in maps:
-#         while ranges:
-#             start_range, end_range = ranges.pop()
-#             for target, start_map, r in _map:
-#                 end_map = start_map + r
-#                 offset = target - start_map
-#                 if end_map <= start_range or end_range <= start_map:  # no overlap
-#                     continue
-#                 if start_range < start_map:
-#                     ranges.append([start_range, start_map])
-#                     start_range = start_map
-#                 if end_map < end_range:
-#                     ranges.append([end_map, end_range])
-#                     end_range = end_map
-#                 results.append([start_range + offset, end_range + offset])
-#                 break
-#             else:
-#                 results.append([start_range, end_range])
-#         ranges = results
-#         results = []
-#     locations += ranges
-# print(min(loc[0] for loc in locations))
