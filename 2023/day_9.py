@@ -27,8 +27,7 @@ def day_9(data):
             checks[i - 1].insert(0, checks[i - 1][0] - checks[i][0])
         p1_answer += checks[0][-1]
         p2_answer += checks[0][0]
-    print("part 1: ", p1_answer)
-    print("part 2: ", p2_answer)
+    print("part 1: ", p1_answer, "\npart 2: ", p2_answer)
 
 
 day_9(puzzle)
