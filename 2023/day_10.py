@@ -93,7 +93,7 @@ def day_10(data):
                 continue
             if path.contains_point((x, y)):
                 contained += 1
-    print("part 1: ", contained)
+    print("part 2: ", contained)
 
 
 day_10(puzzle)
