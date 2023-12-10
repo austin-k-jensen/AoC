@@ -33,7 +33,7 @@ TEST_3 = """
 """
 
 
-def day_10(data):
+def part_1(data):
     rows = data.split()
 
     start_loc = [
@@ -84,11 +84,20 @@ def day_10(data):
         steps += 1
     print("part 1: ", steps // 2)
 
+    return visited
+
+
+def part_2(visited):
     path = Path(visited)
 
+    min_x = min(loc[0] for loc in visited)
+    max_x = max(loc[0] for loc in visited)
+    min_y = min(loc[1] for loc in visited)
+    max_y = max(loc[1] for loc in visited)
+
     contained = 0
-    for y in range(len(rows)):
-        for x in range(len(rows[0])):
+    for x in range(min_x, max_x):
+        for y in range(min_y, max_y):
             if (x, y) in visited:
                 continue
             if path.contains_point((x, y)):
@@ -96,4 +105,5 @@ def day_10(data):
     print("part 2: ", contained)
 
 
-day_10(puzzle)
+visited = part_1(puzzle)
+part_2(visited)
