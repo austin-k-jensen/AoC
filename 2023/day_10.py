@@ -105,10 +105,5 @@ def part_2(visited):
     print("part 2: ", contained)
 
 
-def part_2_tst(data, visited):
-    rows = data.split()
-
-
-visited = part_1(TEST_3)
+visited = part_1(puzzle)
 part_2(visited)
-part_2_tst(TEST_3, visited)
