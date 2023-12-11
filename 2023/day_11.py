@@ -50,9 +50,7 @@ def day_11(data, expand):
     dists = []
     for i, point_1 in enumerate(points):
         for point_2 in points[i:]:
-            dist = abs(point_1[0] - point_2[0]) + abs(point_1[1] - point_2[1])
-            if dist != 0:
-                dists.append(dist)
+            dists.append(abs(point_1[0] - point_2[0]) + abs(point_1[1] - point_2[1]))
     return sum(dists)
 
 
