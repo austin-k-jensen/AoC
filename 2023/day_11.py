@@ -1,4 +1,5 @@
 import numpy as np
+from itertools import combinations
 from aocd import get_data
 
 YEAR, DAY = 2023, 11
@@ -48,11 +49,11 @@ def day_11(data, expand):
             cc += expand
 
     dists = []
-    for i, point_1 in enumerate(points):
-        for point_2 in points[i:]:
-            dists.append(abs(point_1[0] - point_2[0]) + abs(point_1[1] - point_2[1]))
+    for (x1, y1), (x2, y2) in combinations(points, 2):
+        dists.append(abs(x1 - x2) + abs(y1 - y2))
+
     return sum(dists)
 
 
-print(day_11(puzzle, 1))
-print(day_11(puzzle, 999999))
+print("part 1: ", day_11(puzzle, 1))
+print("part 2: ", day_11(puzzle, 999999))
