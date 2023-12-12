@@ -1,6 +1,5 @@
 import re
 from datetime import datetime
-from itertools import product
 from functools import cache
 from aocd import get_data
 
@@ -16,43 +15,10 @@ TEST_1 = """
 ?###???????? 3,2,1
 """
 
-TEST_2 = """
-????.#...#... 4,1,1
-"""
-
-
-def part_1(data):
-    scriptstart = datetime.now()
-
-    records = [
-        (string, [int(x) for x in lst.split(",")])
-        for (string, lst) in re.findall(r"([?.#]+) (\d+(?:,*\d+)+)", data)
-    ]
-
-    arrangements = 0
-    for record, cnts in records:
-        chk = "^\.*"
-        for cnt in cnts:
-            chk += f"#{{{cnt}}}\.+"
-        chk = chk[:-1] + "*$"
-
-        for p in map(iter, product(".#", repeat=record.count("?"))):
-            tst = "".join(c if c != "?" else next(p) for c in record)
-            if re.match(chk, tst):
-                arrangements += 1
-
-    scriptend = datetime.now()
-    elapsed = scriptend - scriptstart
-    elapsed_sec = elapsed.seconds
-    print(f"{scriptend}: Part 1 complete in seconds: {elapsed_sec}")
-    print("part 1: ", arrangements, "\n")
-
 
 @cache
 def spring_count(record, cnts):
-    # print(record, cnts)
     if len(record) == 0 and len(cnts) == 0:
-        # print("match")
         return 1
     if len(record) == 0 and len(cnts) > 0:
         return 0
@@ -70,11 +36,31 @@ def spring_count(record, cnts):
         if "." in record[: cnts[0]]:
             return 0
         if len(cnts) > 1:
-            if len(record) < (cnts[0] + 1) or record[cnts[0]] == "#":
+            if record[cnts[0]] == "#":
                 return 0
-            return spring_count(record[cnts[0] + 1 :], cnts[1:])
+            else:
+                return spring_count(record[cnts[0] + 1 :], cnts[1:])
         if len(cnts) == 1:
             return spring_count(record[cnts[0] :], cnts[1:])
+
+
+def part_1(data):
+    scriptstart = datetime.now()
+
+    records = [
+        (string, tuple([int(x) for x in lst.split(",")]))
+        for (string, lst) in re.findall(r"([?.#]+) (\d+(?:,*\d+)+)", data)
+    ]
+
+    arrangements = 0
+    for record, cnts in records:
+        arrangements += spring_count(record, cnts)
+
+    scriptend = datetime.now()
+    elapsed = scriptend - scriptstart
+    elapsed_sec = elapsed.seconds
+    print(f"{scriptend}: Part 1 complete in seconds: {elapsed_sec}")
+    print("part 1: ", arrangements)
 
 
 def part_2(data):
@@ -92,7 +78,7 @@ def part_2(data):
     scriptend = datetime.now()
     elapsed = scriptend - scriptstart
     elapsed_sec = elapsed.seconds
-    print(f"{scriptend}: Part 2 complete in seconds: {elapsed_sec}")
+    print(f"\n{scriptend}: Part 2 complete in seconds: {elapsed_sec}")
     print("part 2: ", arrangements)
 
 
