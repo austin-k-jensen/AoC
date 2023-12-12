@@ -1,6 +1,7 @@
 import re
 from datetime import datetime
 from itertools import product
+from functools import cache
 from aocd import get_data
 
 YEAR, DAY = 2023, 12
@@ -16,7 +17,7 @@ TEST_1 = """
 """
 
 TEST_2 = """
-.??..??...?##. 1,1,3
+????.#...#... 4,1,1
 """
 
 
@@ -28,7 +29,7 @@ def part_1(data):
         for (string, lst) in re.findall(r"([?.#]+) (\d+(?:,*\d+)+)", data)
     ]
 
-    arrangement = 0
+    arrangements = 0
     for record, cnts in records:
         chk = "^\.*"
         for cnt in cnts:
@@ -38,62 +39,62 @@ def part_1(data):
         for p in map(iter, product(".#", repeat=record.count("?"))):
             tst = "".join(c if c != "?" else next(p) for c in record)
             if re.match(chk, tst):
-                arrangement += 1
+                arrangements += 1
 
     scriptend = datetime.now()
     elapsed = scriptend - scriptstart
     elapsed_sec = elapsed.seconds
     print(f"{scriptend}: Part 1 complete in seconds: {elapsed_sec}")
-    print("part 1: ", arrangement, "\n")
+    print("part 1: ", arrangements, "\n")
 
 
+@cache
 def spring_count(record, cnts):
-    print(record, cnts)
+    # print(record, cnts)
     if len(record) == 0 and len(cnts) == 0:
+        # print("match")
         return 1
     if len(record) == 0 and len(cnts) > 0:
         return 0
     if record[0] == ".":
-        spring_count(record[1:], cnts)
+        return spring_count(record[1:], cnts)
+    if record[0] == "?":
+        return spring_count("." + record[1:], cnts) + spring_count(
+            "#" + record[1:], cnts
+        )
+    if record[0] == "#":
+        if len(cnts) == 0:
+            return 0
+        if len(record) < sum(cnts):
+            return 0
+        if "." in record[: cnts[0]]:
+            return 0
+        if len(cnts) > 1:
+            if len(record) < (cnts[0] + 1) or record[cnts[0]] == "#":
+                return 0
+            return spring_count(record[cnts[0] + 1 :], cnts[1:])
+        if len(cnts) == 1:
+            return spring_count(record[cnts[0] :], cnts[1:])
 
 
 def part_2(data):
     scriptstart = datetime.now()
 
-    # records = [
-    #     ("?".join([string] * 5), [int(x) for x in lst.split(",")] * 5)
-    #     for (string, lst) in re.findall(r"([?.#]+) (\d+(?:,*\d+)+)", data)
-    # ]
-
     records = [
-        (string, tuple([int(i) for i in lst.split(",")]))
+        ("?".join([string] * 5), tuple([int(x) for x in lst.split(",")] * 5))
         for (string, lst) in re.findall(r"([?.#]+) (\d+(?:,*\d+)+)", data)
     ]
 
+    arrangements = 0
     for record, cnts in records:
-        spring_count(record, cnts)
-
-    arrangement = 0
-    # for record, cnts in records:
-    #     chk = "^\.*"
-    #     for cnt in cnts:
-    #         chk += f"#{{{cnt}}}\.+"
-    #     chk = chk[:-1] + "*$"
-    #     print(chk)
-    #     print(record, "\n")
-
-    #     for p in map(iter, product(".#", repeat=record.count("?"))):
-    #         tst = "".join(c if c != "?" else next(p) for c in record)
-    #         if re.match(chk, tst):
-    #             # print(tst)
-    #             arrangement += 1
+        arrangements += spring_count(record, cnts)
 
     scriptend = datetime.now()
     elapsed = scriptend - scriptstart
     elapsed_sec = elapsed.seconds
     print(f"{scriptend}: Part 2 complete in seconds: {elapsed_sec}")
-    print("part 2: ", arrangement)
+    print("part 2: ", arrangements)
 
 
-# part_1(TEST_1)
-part_2(TEST_2)
+part_1(puzzle)
+part_2(puzzle)
