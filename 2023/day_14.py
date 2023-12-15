@@ -1,6 +1,3 @@
-import numpy as np
-from datetime import datetime
-from functools import cache
 from aocd import get_data
 
 YEAR, DAY = 2023, 14
@@ -20,7 +17,6 @@ O.#..O.#.#
 """
 
 
-@cache
 def shift_rocks_NW(rows):
     moved = []
     for row in rows:
@@ -34,7 +30,6 @@ def shift_rocks_NW(rows):
     return tuple(moved)
 
 
-@cache
 def shift_rocks_SE(rows):
     moved = []
     for row in rows:
@@ -48,7 +43,6 @@ def shift_rocks_SE(rows):
     return tuple(moved)
 
 
-@cache
 def shift_cycle(rows):
     N_rows = ("".join(s) for s in zip(*rows))
     N_moved = shift_rocks_NW(N_rows)
@@ -63,7 +57,6 @@ def shift_cycle(rows):
 
 
 def part_1(data):
-    scriptstart = datetime.now()
     rows = data.strip().split()
     max_dist = len(rows)
     t_rows = ("".join(s) for s in zip(*rows))
@@ -74,19 +67,31 @@ def part_1(data):
     for row in moved:
         for i, space in enumerate(row):
             load += (max_dist - i) if space == "O" else 0
-    scriptend = datetime.now()
-    elapsed = scriptend - scriptstart
-    elapsed_sec = elapsed.seconds
-    print(f"{scriptend}: Part 1 complete in seconds: {elapsed_sec}")
+
     print("part 1: ", load)
 
 
 def part_2(data):
-    scriptstart = datetime.now()
     rows = tuple(data.strip().split())
     max_dist = len(rows)
 
-    for i in range(1000000000):
+    seen = set()
+    cycles = 0
+    while rows not in seen:
+        seen.add(rows)
+        rows = shift_cycle(rows)
+        cycles += 1
+
+    first_cycle = rows
+    rows = shift_cycle(rows)
+    cycle_length = 1
+    while rows != first_cycle:
+        rows = shift_cycle(rows)
+        cycle_length += 1
+
+    remain = (1000000000 - (cycles - cycle_length)) % cycle_length
+
+    for i in range(remain):
         rows = shift_cycle(rows)
 
     moved = ("".join(s) for s in zip(*rows))
@@ -95,10 +100,7 @@ def part_2(data):
     for row in moved:
         for i, space in enumerate(row):
             load += (max_dist - i) if space == "O" else 0
-    scriptend = datetime.now()
-    elapsed = scriptend - scriptstart
-    elapsed_sec = elapsed.seconds
-    print(f"\n{scriptend}: Part 2 complete in seconds: {elapsed_sec}")
+
     print("part 2: ", load)
 
 
