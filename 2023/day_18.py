@@ -26,36 +26,24 @@ U 2 (#7a21e3)
 def part_1(data):
     digs = [(dir, int(dist)) for (dir, dist) in re.findall(r"([UDRL]) (\d+)", data)]
 
-    loc = [0, 0]
-    visited = [loc]
-
+    start = (0, 0)
+    visited = [start]
+    area = 0
+    boarder = 0
     for dir, dist in digs:
-        for _ in range(dist):
-            if dir == "U":
-                loc[1] += -1
-            elif dir == "D":
-                loc[1] += 1
-            elif dir == "R":
-                loc[0] += 1
-            elif dir == "L":
-                loc[0] += -1
-            visited.append([loc[0], loc[1]])
-
-    path = Path(visited, closed=True)
-
-    min_x = min(loc[0] for loc in visited)
-    max_x = max(loc[0] for loc in visited)
-    min_y = min(loc[1] for loc in visited)
-    max_y = max(loc[1] for loc in visited)
-
-    contained = 0
-    for y in range(min_y, max_y + 1):
-        for x in range(min_x, max_x + 1):
-            if (x, y) in visited:
-                continue
-            if path.contains_point((x, y)):
-                contained += 1
-    print("part 1: ", contained + len(visited) - 1)
+        boarder += dist
+        loc = visited[-1]
+        if dir == "U":
+            new_loc = (loc[0], loc[1] + dist * -1)
+        elif dir == "D":
+            new_loc = (loc[0], loc[1] + dist)
+        elif dir == "R":
+            new_loc = (loc[0] + dist, loc[1])
+        elif dir == "L":
+            new_loc = (loc[0] + dist * -1, loc[1])
+        visited.append((new_loc))
+        area += (new_loc[0] - loc[0]) * ((new_loc[1] + loc[1]) / 2)
+    print("part 1: ", int(abs(area) + boarder / 2 + 1))
 
 
 def part_2(data):
@@ -68,7 +56,6 @@ def part_2(data):
     for dir, dist in digs:
         boarder += dist
         loc = visited[-1]
-        # for _ in range(dist):
         if dir == 3:
             new_loc = (loc[0], loc[1] + dist * -1)
         elif dir == 1:
@@ -78,26 +65,9 @@ def part_2(data):
         elif dir == 2:
             new_loc = (loc[0] + dist * -1, loc[1])
         visited.append((new_loc))
-        # print(loc, new_loc)
         area += (new_loc[0] - loc[0]) * ((new_loc[1] + loc[1]) / 2)
-    print(abs(area) + boarder / 2 + 1)
-
-    # path = Path(visited, closed=True)
-
-    # min_x = min(loc[0] for loc in visited)
-    # max_x = max(loc[0] for loc in visited)
-    # min_y = min(loc[1] for loc in visited)
-    # max_y = max(loc[1] for loc in visited)
-
-    # contained = 0
-    # for y in range(min_y, max_y + 1):
-    #     for x in range(min_x, max_x + 1):
-    #         if (x, y) in visited:
-    #             continue
-    #         if path.contains_point((x, y)):
-    #             contained += 1
-    # print("part 2: ", contained + len(visited) - 1)
+    print("part 2: ", int(abs(area) + boarder / 2 + 1))
 
 
-# part_1(TEST_1)
+part_1(puzzle)
 part_2(puzzle)
