@@ -1,5 +1,4 @@
 import re
-from pprint import pprint
 from numexpr import evaluate
 from math import lcm
 from aocd import get_data
@@ -43,7 +42,6 @@ def part_1(data):
 
     monkey_dict = {}
     for i, monkey in enumerate(monkeys):
-        # print(i, monkey)
         monkey_dict[i] = {}
 
         monkey_dict[i]["items"] = [
@@ -57,14 +55,11 @@ def part_1(data):
         monkey_dict[i]["false"] = int(re.findall(r"false: .+(\d+)", monkey)[0])
         monkey_dict[i]["count"] = 0
 
-    # pprint(monkey_dict)
     for i in range(20):
         for monkey in monkey_dict:
-            # print(monkey_dict[monkey])
             for i, item in enumerate(list(monkey_dict[monkey]["items"])):
                 operation = monkey_dict[monkey]["operation"].replace("old", str(item))
                 worry = evaluate(operation) // 3
-                # print(i, item, operation, worry)
 
                 if worry % monkey_dict[monkey]["test"] == 0:
                     toss = monkey_dict[monkey]["true"]
@@ -74,7 +69,6 @@ def part_1(data):
                 monkey_dict[monkey]["count"] += 1
                 monkey_dict[toss]["items"].append(worry)
 
-    # pprint(monkey_dict)
     cnts = [monkey_dict[monkey]["count"] for monkey in monkey_dict]
     cnts_srt = sorted(cnts, reverse=True)
     print("part 1: ", cnts_srt[0] * cnts_srt[1])
@@ -85,7 +79,6 @@ def part_2(data):
 
     monkey_dict = {}
     for i, monkey in enumerate(monkeys):
-        # print(i, monkey)
         monkey_dict[i] = {}
 
         monkey_dict[i]["items"] = [
@@ -102,14 +95,11 @@ def part_2(data):
     tests = [monkey_dict[monkey]["test"] for monkey in monkey_dict]
     worry_reduc = lcm(*tests)
 
-    # pprint(monkey_dict)
     for i in range(10000):
         for monkey in monkey_dict:
-            # print(monkey_dict[monkey])
             for i, item in enumerate(list(monkey_dict[monkey]["items"])):
                 operation = monkey_dict[monkey]["operation"].replace("old", str(item))
                 worry = evaluate(operation) % worry_reduc
-                # print(i, item, operation, worry)
 
                 if worry % monkey_dict[monkey]["test"] == 0:
                     toss = monkey_dict[monkey]["true"]
@@ -119,7 +109,6 @@ def part_2(data):
                 monkey_dict[monkey]["count"] += 1
                 monkey_dict[toss]["items"].append(worry)
 
-    # pprint(monkey_dict)
     cnts = [monkey_dict[monkey]["count"] for monkey in monkey_dict]
     cnts_srt = sorted(cnts, reverse=True)
     print("part 2: ", cnts_srt[0] * cnts_srt[1])
