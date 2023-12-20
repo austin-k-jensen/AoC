@@ -1,9 +1,7 @@
 import re
 from numexpr import evaluate
-from operator import mul
-from functools import reduce
-from aocd import get_data
 from collections import defaultdict
+from aocd import get_data
 
 YEAR, DAY = 2023, 19
 puzzle = get_data(day=DAY, year=YEAR)
