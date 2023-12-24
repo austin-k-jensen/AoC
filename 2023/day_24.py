@@ -1,6 +1,7 @@
 import re
 from itertools import combinations
 import numpy as np
+import sympy
 from aocd import get_data
 
 YEAR, DAY = 2023, 24
@@ -39,7 +40,48 @@ def part_1(data):
                 cnt += 1
         except:
             pass
-    print(cnt)
+    print("part 1: ", cnt)
+
+
+def part_2(data):
+    xr = sympy.Symbol("xr")
+    yr = sympy.Symbol("yr")
+    zr = sympy.Symbol("zr")
+    vxr = sympy.Symbol("vxr")
+    vyr = sympy.Symbol("vyr")
+    vzr = sympy.Symbol("vzr")
+    t1 = sympy.Symbol("t1")
+    t2 = sympy.Symbol("t2")
+    t3 = sympy.Symbol("t3")
+
+    stones = data.strip().splitlines()[:3]
+
+    x1, y1, z1, vx1, vy1, vz1 = [
+        int(coord) for coord in re.findall(r"(-?\d+)", stones[0])
+    ]
+    x2, y2, z2, vx2, vy2, vz2 = [
+        int(coord) for coord in re.findall(r"(-?\d+)", stones[1])
+    ]
+    x3, y3, z3, vx3, vy3, vz3 = [
+        int(coord) for coord in re.findall(r"(-?\d+)", stones[2])
+    ]
+
+    xeq1 = xr + vxr * t1 - x1 - vx1 * t1
+    yeq1 = yr + vyr * t1 - y1 - vy1 * t1
+    zeq1 = zr + vzr * t1 - z1 - vz1 * t1
+    xeq2 = xr + vxr * t2 - x2 - vx2 * t2
+    yeq2 = yr + vyr * t2 - y2 - vy2 * t2
+    zeq2 = zr + vzr * t2 - z2 - vz2 * t2
+    xeq3 = xr + vxr * t3 - x3 - vx3 * t3
+    yeq3 = yr + vyr * t3 - y3 - vy3 * t3
+    zeq3 = zr + vzr * t3 - z3 - vz3 * t3
+
+    solve = sympy.solve_poly_system(
+        [xeq1, yeq1, zeq1, xeq2, yeq2, zeq2, xeq3, yeq3, zeq3],
+        [xr, yr, zr, vxr, vyr, vzr, t1, t2, t3],
+    )[0]
+    print("part 2: ", solve[0] + solve[1] + solve[2])
 
 
 part_1(puzzle)
+part_2(puzzle)
