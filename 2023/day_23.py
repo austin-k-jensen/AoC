@@ -133,6 +133,41 @@ def part_2(start, end, grid):
     print("part 2: ", max(paths))
 
 
-start, end, grid = parse(puzzle)
+def condense_graph(start, end, grid):
+    edge = max(grid)
+    dirs = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+    graph = {}
+
+    check = [start]
+    visited = set()
+
+    lenth = 0
+    node = False
+    while check:
+        loc = check.pop()
+
+        if (loc) in visited:
+            continue
+
+        visited.add(loc)
+        # print(visited)
+
+        node_check = []
+        for dir in dirs:
+            new_loc = (loc[0] + dir[0], loc[1] + dir[1])
+            if (
+                (0 <= new_loc[0] <= edge[0])
+                and (0 <= new_loc[1] <= edge[1])
+                and grid[new_loc] != "#"
+                and new_loc not in visited
+            ):
+                check.append(new_loc)
+                node_check.append(new_loc)
+        if len(node_check) > 1:
+            print(loc, node_check)
+
+
+start, end, grid = parse(TEST_1)
+condense_graph(start, end, grid)
 # part_1(start, end, grid)
-part_2(start, end, grid)
+# part_2(start, end, grid)
