@@ -1,3 +1,4 @@
+import numpy as np
 from aocd import get_data
 
 YEAR, DAY = 2023, 21
@@ -124,32 +125,21 @@ def part_2_analysis(start, grid):
     print("part 2: ", dests)
 
 
-def part_2_seq(start, grid):
-    # history = [part_2_wrap(start, 65 + i * 131, grid) for i in range(4)]
+def part_2_quad(start, steps, grid):
+    h, w = max(grid)[0] + 1, max(grid)[1] + 1
+    grids = (steps - start[0]) // w
 
-    steps = 458
-    cnt = 3
-    history = [2722, 25621, 71435, 140107]
-    while steps < 26501365:
-        steps += 131
-        cnt += 1
+    b0 = part_2_wrap(start, start[0], grid)
+    b1 = part_2_wrap(start, start[0] + w, grid)
+    b2 = part_2_wrap(start, start[0] + w * 2, grid)
 
-        checks = []
-        while not all(i == 0 for i in history):
-            checks.append(history)
-            next = []
-            for i in range(len(history) - 1):
-                next.append(history[i + 1] - history[i])
-            history = next
-        for i in range(len(checks) - 1, 0, -1):
-            checks[i - 1].append(checks[i - 1][-1] + checks[i][-1])
+    A = np.matrix([[0, 0, 1], [1, 1, 1], [4, 2, 1]])
+    b = np.array([b0, b1, b2])
 
-        history = checks[0]
-    print(steps, cnt, checks[0][-1])
+    x = np.linalg.solve(A, b).astype(np.int64)
+    print("part 2:", x[0] * grids**2 + x[1] * grids + x[2])
 
 
 start, grid = parse(puzzle)
-# print("part 1: ", part_1(start, 64, grid))
-# part_2_wrap(start, 100, grid)
-# part_2_analysis(start, grid)
-# part_2_seq(start, grid)
+print("part 1: ", part_1(start, 64, grid))
+part_2_quad(start, 26501365, grid)
