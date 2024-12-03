@@ -41,7 +41,6 @@ def part_1(reports):
             unsafe.append(report)
 
     for report in unsafe:
-        # print(report)
         for i, _ in enumerate(report):
             test = report[:i] + report[i + 1 :]
             if check_safe(test) == 1:
