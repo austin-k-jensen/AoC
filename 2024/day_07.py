@@ -27,8 +27,6 @@ def parse(data):
 
 
 def eval(nums: list, ans: list):
-    # print(nums)
-
     if len(nums) == 1:
         ans.append(nums[0])
         return
@@ -55,8 +53,6 @@ def part_1(eqs):
 
 
 def eval_2(nums: list, ans: list):
-    # print(nums)
-
     if len(nums) == 1:
         ans.append(nums[0])
         return
@@ -84,5 +80,5 @@ def part_2(eqs):
 
 
 eqs = parse(puzzle)
-# print("part 1: ", part_1(eqs))
-print(part_2(eqs))
+print("part 1: ", part_1(eqs))
+print("part 2: ", part_2(eqs))
