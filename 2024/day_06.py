@@ -1,4 +1,5 @@
 from aocd import get_data
+from utils import timing
 
 YEAR, DAY = 2024, 6
 puzzle = get_data(day=DAY, year=YEAR)
@@ -17,6 +18,7 @@ TEST_1 = """
 """
 
 
+@timing
 def parse(data):
     rows = data.strip().split()
     grid = {}
@@ -30,6 +32,7 @@ def parse(data):
     return start, grid
 
 
+@timing
 def part_1(start, grid):
     edge = max(grid)
     dirs = [(-1, 0), (0, 1), (1, 0), (0, -1)]
@@ -59,6 +62,7 @@ def part_1(start, grid):
         visited.add(loc)
 
 
+@timing
 def part_2(start, grid, open_spots):
     edge = max(grid)
     dirs = [(-1, 0), (0, 1), (1, 0), (0, -1)]
@@ -68,8 +72,7 @@ def part_2(start, grid, open_spots):
     open_spots.remove(start)
 
     for spot in open_spots:
-        test_grid = grid.copy()
-        test_grid[spot] = "#"
+        grid[spot] = "#"
 
         visited = set()
 
@@ -87,16 +90,18 @@ def part_2(start, grid, open_spots):
                 or new_loc[1] > edge[1]
             ):
                 left.append(spot)
+                grid[spot] = "."
                 break
 
             if (new_loc, dir_ind) in visited:
                 blocked.append(spot)
+                grid[spot] = "."
                 break
 
-            if test_grid[new_loc] == "#":
+            if grid[new_loc] == "#":
                 dir_ind = (dir_ind + 1) % 4
                 new_loc = (loc[0] + dirs[dir_ind][0], loc[1] + dirs[dir_ind][1])
-                if test_grid[new_loc] == "#":
+                if grid[new_loc] == "#":
                     dir_ind = (dir_ind + 1) % 4
                     loc = (loc[0] + dirs[dir_ind][0], loc[1] + dirs[dir_ind][1])
                 else:
