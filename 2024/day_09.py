@@ -6,6 +6,7 @@ puzzle = get_data(day=DAY, year=YEAR)
 
 TEST_1 = "2333133121414131402"
 TEST_2 = "12345"
+TEST_3 = "14113"
 
 
 @timing
@@ -28,9 +29,7 @@ def part_1(files, spaces):
     num_files = len(file_blocks)
     index = 0
     for file, space in zip(files, spaces):
-        # print(file, space)
         disk += file_blocks[index : index + file]
-        # print(disk)
         index += file
 
         for i in range(space):
@@ -38,8 +37,6 @@ def part_1(files, spaces):
                 disk.append(file_blocks.pop())
             else:
                 break
-
-        # print(disk)
 
     tot = 0
     for i, file in enumerate(disk):
@@ -56,38 +53,61 @@ def part_2(files, spaces):
             file_blocks += ["."] * spaces[i]
 
     r_index = len(file_blocks) - 1
-    for r_file, r_space in zip(reversed(files), reversed(spaces)):
-        print(file_blocks)
-        print(f"Checking file {r_file}: {file_blocks[r_index-r_file+1:r_index+1]}")
-        f_index = 0
-        r_index -= r_file
+    check_id = len(files) - 1
 
-        for i, (f_file, f_space) in enumerate(zip(files, spaces)):
+    for r_file, r_space in zip(reversed(files), reversed(spaces)):
+
+        f_index = 0
+        fit = False
+
+        files, spaces = [], []
+        comp = 0
+        cnt = 0
+        for block in file_blocks:
+            if block == comp:
+                cnt += 1
+            else:
+                if comp == ".":
+                    spaces.append(cnt)
+                else:
+                    if block != ".":
+                        spaces.append(0)
+                    files.append(cnt)
+                if block == check_id:
+                    break
+                cnt = 1
+            comp = block
+        check_id -= 1
+
+        for f_file, f_space in zip(files, spaces):
 
             f_index += f_file
-            print(f"Checking space {f_space}: {file_blocks[f_index:f_index + f_space]}")
 
             if r_file <= f_space:
-                print("\tFile fits")
-                spaces[i] = f_space - r_file
                 for _ in range(r_file):
-                    # print(f_index)
                     file_blocks[f_index] = file_blocks[r_index]
                     file_blocks[r_index] = "."
                     f_index += 1
                     r_index -= 1
 
-                files[i] = f_file + r_file
-                spaces[i] = f_space - r_file
+                r_index -= r_space
+                fit = True
                 break
             else:
                 f_index += f_space
 
-                # print(r_index)
-            # print(f"No space found")
-        r_index -= r_space
+        if not fit:
+            r_index -= r_file + r_space
+
+    tot = 0
+    for i, file in enumerate(file_blocks):
+        if file == ".":
+            pass
+        else:
+            tot += i * file
+    return tot
 
 
-files, spaces = parse(TEST_1)
-# print("part 1: ", part_1(files, spaces))
-part_2(files, spaces)
+files, spaces = parse(puzzle)
+print("part 1: ", part_1(files, spaces))
+print("part 2: ", part_2(files, spaces))
