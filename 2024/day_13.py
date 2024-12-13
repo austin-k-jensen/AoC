@@ -43,37 +43,20 @@ def parse(data: str):
 
 
 @timing
-def part_1(systems):
+def both(systems, shift):
 
     tot = 0
     for system in systems:
-        A, B = np.linalg.inv(system[0]).dot(system[1])
+
+        A, B = np.linalg.inv(system[0]).dot(system[1] + shift)
         int_A = int(round(A))
         int_B = int(round(B))
 
-        if isclose(A, int_A) and isclose(B, int_B):
-            tot += 3 * int_A + int_B
-    return tot
-
-
-@timing
-def part_2(systems):
-
-    tot = 0
-    for system in systems:
-        # print(system[1] + 10000000000000)
-
-        A, B = np.linalg.inv(system[0]).dot(system[1] + 10000000000000)
-        int_A = int(round(A))
-        int_B = int(round(B))
-
-        # print(A, B)
-        if isclose(A, int_A, rel_tol=1e-15) and isclose(B, int_B, rel_tol=1e-15):
-            # print(int_A, int_B)
+        if isclose(A, int_A, rel_tol=1e-13) and isclose(B, int_B, rel_tol=1e-13):
             tot += 3 * int_A + int_B
     return tot
 
 
 systems = parse(puzzle)
-print("part 1: ", part_1(systems))
-print("part 2: ", part_2(systems))
+print("part 1: ", both(systems, 0))
+print("part 1: ", both(systems, 10000000000000))
