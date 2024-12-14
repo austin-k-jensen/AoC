@@ -1,6 +1,4 @@
 import re
-from itertools import combinations
-from math import sqrt
 from aocd import get_data
 from utils import timing
 
@@ -58,24 +56,34 @@ def part_1(robots: list, edge: tuple, seconds: int):
 
 
 @timing
-def part_2(robots: list, edge: tuple, max_seconds: int):
-    entropies = {}
+def part_2(robots: list, edge: tuple, time_range: tuple):
+    scores = {}
     X, Y = edge
 
-    for sec in range(1, max_seconds + 1):
+    start, stop = time_range
+
+    for sec in range(start, stop + 1):
         positions = []
+        quads = {1: 0, 2: 0, 3: 0, 4: 0}
         for p, v in robots:
-            positions.append(((p[0] + v[0] * sec) % X, (p[1] + v[1] * sec) % Y))
 
-        entropy = 0
-        for (x1, y1), (x2, y2) in combinations(positions, 2):
-            entropy += sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+            new_x = (p[0] + v[0] * sec) % X
+            new_y = (p[1] + v[1] * sec) % Y
 
-        entropies[entropy] = (sec, positions)
+            if new_x < X // 2 and new_y < Y // 2:
+                quads[1] += 1
+            elif new_x > X // 2 and new_y < Y // 2:
+                quads[2] += 1
+            elif new_x < X // 2 and new_y > Y // 2:
+                quads[3] += 1
+            elif new_x > X // 2 and new_y > Y // 2:
+                quads[4] += 1
 
-    time, positions = entropies[min(entropies)]
+            positions.append((new_x, new_y))
 
-    # print(time, positions)
+        scores[quads[1] * quads[2] * quads[3] * quads[4]] = (sec, positions)
+
+    time, positions = scores[min(scores)]
 
     for y in range(Y):
         row = ""
@@ -90,7 +98,5 @@ def part_2(robots: list, edge: tuple, max_seconds: int):
 
 
 robots = parse(puzzle)
-# robots = [((2, 4), (2, -3))]
-# part_1(robots, (11, 7), 100)
-# print("part 1: ", part_1(robots, (101, 103), 100))
-print("part 2: ", part_2(robots, (101, 103), 6000))
+print("part 1: ", part_1(robots, (101, 103), 100))
+print("part 2: ", part_2(robots, (101, 103), (1, 10000)))
