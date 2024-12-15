@@ -1,7 +1,6 @@
 from aocd import get_data
 from utils import timing
 
-
 YEAR, DAY = 2024, 15
 puzzle = get_data(day=DAY, year=YEAR)
 
@@ -161,52 +160,36 @@ def part_2(moves: str, start: tuple, walls: list, boxes: list):
 
         # print(f"move: {move}")
         new_loc = (loc[0] + dir[0], loc[1] + dir[1])
+        to_check = [new_loc]
+        to_move = []
+        move_boxes = True
 
-        if move in "<>":
-            to_check = [new_loc]
-            to_move = []
-            move_boxes = True
+        while to_check:
+            check = to_check.pop()
+            # print(f"\tChecking: {check}")
 
-            while to_check:
-                check = to_check.pop()
-                # print(f"\tChecking: {check}")
-                if check in walls:
-                    # print("\tFound Wall, not moving")
-                    move_boxes = False
-                elif (check, (check[0] + dir[0], check[1] + dir[1])) in boxes:
+            if check in walls:
+                # print("\tFound Wall, not moving")
+                move_boxes = False
+                break
+
+            elif move in "<>":
+                if (check, (check[0], check[1] + dir[1])) in boxes:
                     # print("\tFound box, adding to list")
                     to_move.append(
-                        boxes.pop(
-                            boxes.index((check, (check[0] + dir[0], check[1] + dir[1])))
-                        )
+                        boxes.pop(boxes.index((check, (check[0], check[1] + dir[1]))))
                     )
-                    to_check.append((check[0] + dir[0] * 2, check[1] + dir[1] * 2))
-                elif ((check[0] + dir[0], check[1] + dir[1]), check) in boxes:
+                    to_check.append((check[0], check[1] + dir[1] * 2))
+
+                elif ((check[0], check[1] + dir[1]), check) in boxes:
                     # print("\tFound box, adding to list")
                     to_move.append(
-                        boxes.pop(
-                            boxes.index(((check[0] + dir[0], check[1] + dir[1]), check))
-                        )
+                        boxes.pop(boxes.index(((check[0], check[1] + dir[1]), check)))
                     )
-                    to_check.append((check[0] + dir[0] * 2, check[1] + dir[1] * 2))
+                    to_check.append((check[0], check[1] + dir[1] * 2))
 
-        elif move in "v^":
-
-            to_check = [new_loc]
-            to_move = []
-            move_boxes = True
-
-            while to_check:
-                check = to_check.pop()
-                # print(f"\tChecking: {check}")
-                # print(f"\tChecking: {(check, (check[0], check[1] + 1))}")
-                # print(f"\tChecking: {((check[0], check[1] - 1), check)}")
-
-                if check in walls:
-                    # print("\tFound Wall, not moving")
-                    move_boxes = False
-                    break
-                elif (check, (check[0], check[1] + 1)) in boxes:
+            elif move in "v^":
+                if (check, (check[0], check[1] + 1)) in boxes:
                     # print("\tFound box, adding to list")
                     to_move.append(
                         boxes.pop(boxes.index((check, (check[0], check[1] + 1))))
@@ -221,6 +204,7 @@ def part_2(moves: str, start: tuple, walls: list, boxes: list):
                     to_check.append((check[0] + dir[0], check[1] - 1))
                     to_check.append((check[0] + dir[0], check[1]))
 
+        # print(f"\tto move: {to_move}")
         if move_boxes:
             loc = new_loc
             for box_1, box_2 in to_move:
@@ -233,17 +217,16 @@ def part_2(moves: str, start: tuple, walls: list, boxes: list):
         else:
             boxes += to_move
 
-        #     print(f"\tto move: {to_move}")
-
         # print(f"\tboxes: {boxes}")
         # print(f"\tloc: {loc}")
+
     tot = 0
     for (i, j), _ in boxes:
         tot += i * 100 + j
     return tot
 
 
-# moves, start, walls, boxes = parse(puzzle)
-# print("part 1: ", part_1(moves, start, walls, boxes))
+moves, start, walls, boxes = parse(puzzle)
+print("part 1: ", part_1(moves, start, walls, boxes))
 moves, start, walls, boxes = parse_2(puzzle)
 print("part 2: ", part_2(moves, start, walls, boxes))
