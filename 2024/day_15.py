@@ -163,16 +163,16 @@ def part_2(moves: str, start: tuple, walls: list, boxes: list):
         new_loc = (loc[0] + dir[0], loc[1] + dir[1])
 
         if move in "<>":
-            check = new_loc
+            to_check = [new_loc]
             to_move = []
-            checking = True
             move_boxes = True
 
-            while checking:
+            while to_check:
+                check = to_check.pop()
                 # print(f"\tChecking: {check}")
                 if check in walls:
                     # print("\tFound Wall, not moving")
-                    move_boxes, checking = False, False
+                    move_boxes = False
                 elif (check, (check[0] + dir[0], check[1] + dir[1])) in boxes:
                     # print("\tFound box, adding to list")
                     to_move.append(
@@ -180,7 +180,7 @@ def part_2(moves: str, start: tuple, walls: list, boxes: list):
                             boxes.index((check, (check[0] + dir[0], check[1] + dir[1])))
                         )
                     )
-                    check = (check[0] + dir[0] * 2, check[1] + dir[1] * 2)
+                    to_check.append((check[0] + dir[0] * 2, check[1] + dir[1] * 2))
                 elif ((check[0] + dir[0], check[1] + dir[1]), check) in boxes:
                     # print("\tFound box, adding to list")
                     to_move.append(
@@ -188,24 +188,7 @@ def part_2(moves: str, start: tuple, walls: list, boxes: list):
                             boxes.index(((check[0] + dir[0], check[1] + dir[1]), check))
                         )
                     )
-                    check = (check[0] + dir[0] * 2, check[1] + dir[1] * 2)
-                else:
-                    # print("\tFound open spot, moving")
-                    loc = new_loc
-                    checking = False
-
-            # print(f"\tto move: {to_move}")
-
-            for box_1, box_2 in to_move:
-                if move_boxes:
-                    boxes.append(
-                        (
-                            (box_1[0] + dir[0], box_1[1] + dir[1]),
-                            (box_2[0] + dir[0], box_2[1] + dir[1]),
-                        )
-                    )
-                else:
-                    boxes.append((box_1, box_2))
+                    to_check.append((check[0] + dir[0] * 2, check[1] + dir[1] * 2))
 
         elif move in "v^":
 
@@ -237,21 +220,18 @@ def part_2(moves: str, start: tuple, walls: list, boxes: list):
                     )
                     to_check.append((check[0] + dir[0], check[1] - 1))
                     to_check.append((check[0] + dir[0], check[1]))
-                # else:
-                #     print("\tFound open spot, moving")
-                #     loc = new_loc
 
-            if move_boxes:
-                loc = new_loc
-                for box_1, box_2 in to_move:
-                    boxes.append(
-                        (
-                            (box_1[0] + dir[0], box_1[1] + dir[1]),
-                            (box_2[0] + dir[0], box_2[1] + dir[1]),
-                        )
+        if move_boxes:
+            loc = new_loc
+            for box_1, box_2 in to_move:
+                boxes.append(
+                    (
+                        (box_1[0] + dir[0], box_1[1] + dir[1]),
+                        (box_2[0] + dir[0], box_2[1] + dir[1]),
                     )
-            else:
-                boxes += to_move
+                )
+        else:
+            boxes += to_move
 
         #     print(f"\tto move: {to_move}")
 
@@ -259,12 +239,11 @@ def part_2(moves: str, start: tuple, walls: list, boxes: list):
         # print(f"\tloc: {loc}")
     tot = 0
     for (i, j), _ in boxes:
-        # print(i * 100 + j)
         tot += i * 100 + j
     return tot
 
 
-moves, start, walls, boxes = parse(puzzle)
-print("part 1: ", part_1(moves, start, walls, boxes))
+# moves, start, walls, boxes = parse(puzzle)
+# print("part 1: ", part_1(moves, start, walls, boxes))
 moves, start, walls, boxes = parse_2(puzzle)
 print("part 2: ", part_2(moves, start, walls, boxes))
