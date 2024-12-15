@@ -2,7 +2,6 @@ import re
 from aocd import get_data
 from utils import timing
 
-
 YEAR, DAY = 2024, 14
 puzzle = get_data(day=DAY, year=YEAR)
 
