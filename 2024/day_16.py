@@ -62,40 +62,7 @@ def parse(data):
 
 
 @timing
-def part_1(start: tuple, end: tuple, grid: dict):
-
-    dir_map = {
-        (1, 0): [(1, 0), (0, 1), (0, -1)],
-        (-1, 0): [(-1, 0), (0, 1), (0, -1)],
-        (0, 1): [(0, 1), (1, 0), (-1, 0)],
-        (0, -1): [(0, -1), (1, 0), (-1, 0)],
-    }
-
-    check = [(0, start, (0, 1))]
-    visited = set()
-
-    while check:
-        score, loc, in_dir = heappop(check)
-
-        if loc == end:
-            return score
-
-        if (loc, in_dir) in visited:
-            continue
-
-        visited.add((loc, in_dir))
-
-        for dir in dir_map[in_dir]:
-            score_change = 1
-            new_loc = (loc[0] + dir[0], loc[1] + dir[1])
-            if grid[new_loc] != "#":
-                if dir != in_dir:
-                    score_change += 1000
-                heappush(check, (score + score_change, new_loc, dir))
-
-
-@timing
-def part_2(start: tuple, end: tuple, grid: dict, best: int):
+def both(start: tuple, end: tuple, grid: dict):
 
     dir_map = {
         (1, 0): [(1, 0), (0, 1), (0, -1)],
@@ -107,12 +74,10 @@ def part_2(start: tuple, end: tuple, grid: dict, best: int):
     check = [(0, start, (0, 1), [start])]
     visited = []
     best_pos = {}
+    best_score = 1 * 10**10
 
     while check:
         score, loc, in_dir, path = heappop(check)
-
-        if loc == end:
-            visited += path
 
         if (loc, in_dir) in best_pos:
             if best_pos[(loc, in_dir)] >= score:
@@ -122,8 +87,9 @@ def part_2(start: tuple, end: tuple, grid: dict, best: int):
         else:
             best_pos[(loc, in_dir)] = score
 
-        if score > best:
-            continue
+        if loc == end and score <= best_score:
+            visited += path
+            best_score = score
 
         for dir in dir_map[in_dir]:
             score_change = 1
@@ -135,10 +101,10 @@ def part_2(start: tuple, end: tuple, grid: dict, best: int):
                 new_path.append(new_loc)
                 heappush(check, (score + score_change, new_loc, dir, new_path))
 
-    return len(set(visited))
+    return best_score, len(set(visited))
 
 
 start, end, grid = parse(puzzle)
-best = part_1(start, end, grid)
+best, num = both(start, end, grid)
 print("part 1: ", best)
-print("part 2: ", part_2(start, end, grid, best))
+print("part 2: ", num)
