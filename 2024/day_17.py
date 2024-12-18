@@ -33,12 +33,10 @@ def parse(data):
     return registers, program
 
 
-def part_1(registers, program):
+def run_program(registers, program):
     pointer = 0
     run = True
     ops = 0
-
-    # print(program)
 
     out = []
     while run:
@@ -95,150 +93,45 @@ def part_1(registers, program):
 
         pointer += 2
         ops += 1
-        # run = False if ops == 100 else True
-    # print(f"registers: {registers}")
-    # print(f"Output:{out}")
+
     return out
 
 
+@timing
+def part_1(registers, program):
+    output = ",".join(map(str, run_program(registers, program)))
+    return output
+
+
 def find_bit(program, ub, step, matches):
-    # print(program, ub, step)
     new_ub = ub
     for _ in range(8):
-        # print(new_ub)
         registers["A"], registers["B"], registers["C"] = new_ub, 0, 0
-        check = part_1(registers, program)
-        # print(check)
-        # print(check[step])
+        check = run_program(registers, program)
+
         if check == program:
             matches.append(new_ub)
             break
+
         if len(check) != len(program):
             break
+
         if check[step] == program[step]:
-            # print(check)
             find_bit(program, new_ub, step - 1, matches)
+
         new_ub -= 8**step
 
 
 @timing
-def part_2(registers, program):
-
-    start = 8 ** (len(program) - 1)
+def part_2(program):
     end = 8 ** (len(program)) - 1
-    # print(start, end)
 
     matches = []
     find_bit(program, end, len(program) - 1, matches)
-    print(min(matches))
 
-    # new_end = end
-    # for i in range(len(program) - 1, 14, -1):
-    #     print(i)
-    #     for _ in range(8):
-    #         registers["A"], registers["B"], registers["C"] = new_end, 0, 0
-    #         out = part_1(registers, program)
-    #         if out[i] == program[i]:
-    #             # print(f"{registers['A']}: {out[i]}")
-    #             new_start = new_end - 8**i + 1
-    #             break
-    #         new_end = new_end - 8**i
-
-    # print(new_end - new_start)
-    # print(program[14:])
-
-    # registers["A"], registers["B"], registers["C"] = new_start - 1, 0, 0
-    # print(registers)
-    # print(part_1(registers, program))
-
-    # registers["A"], registers["B"], registers["C"] = new_start, 0, 0
-    # print(registers)
-    # print(part_1(registers, program))
-
-    # registers["A"], registers["B"], registers["C"] = new_end, 0, 0
-    # print(registers)
-    # print(part_1(registers, program))
-
-    # registers["A"], registers["B"], registers["C"] = new_end + 1, 0, 0
-    # print(registers)
-    # print(part_1(registers, program))
-
-    # a = new_start
-    # last_a = new_start
-    # for a in range(0, 8**3 + 1):
-    #     registers["A"], registers["B"], registers["C"] = a, 0, 0
-    #     print(f"{a}: {part_1(registers, program)}")
-    # while True:
-    #     registers["A"], registers["B"], registers["C"] = a, 0, 0
-    #     # print(f"{a}: {part_1(registers, program)}")
-    #     check = part_1(registers, program)
-    #     if check == program:
-    #         print(a)
-    #         break
-    #     if check[13:] == program[13:]:
-    #         print(a, a - last_a, check)
-    #         last_a = a
-    #     a += 1
+    return min(matches)
 
 
 registers, program = parse(puzzle)
-# print("part 1: ", part_1(registers, program))
-part_2(registers, program)
-
-# TEST_2 = """
-# Register A: 0
-# Register B: 0
-# Register C: 9
-
-# Program: 2,6
-# """
-# registers, program = parse(TEST_2)
-# part_1(registers, program)
-
-########################################################
-
-# TEST_3 = """
-# Register A: 10
-# Register B: 0
-# Register C: 0
-
-# Program: 5,0,5,1,5,4
-# """
-# registers, program = parse(TEST_3)
-# part_1(registers, program)
-
-########################################################
-
-# TEST_4 = """
-# Register A: 2024
-# Register B: 0
-# Register C: 0
-
-# Program: 0,1,5,4,3,0
-# """
-# registers, program = parse(TEST_4)
-# part_1(registers, program)
-
-########################################################
-
-# TEST_5 = """
-# Register A: 0
-# Register B: 29
-# Register C: 0
-
-# Program: 1,7
-# """
-# registers, program = parse(TEST_5)
-# part_1(registers, program)
-
-########################################################
-
-# TEST_6 = """
-# Register A: 0
-# Register B: 2024
-# Register C: 43690
-
-# Program: 4,0
-# """
-# registers, program = parse(TEST_6)
-# part_1(registers, program)
+print("part 1: ", part_1(registers, program))
+print("part 2: ", part_2(program))
