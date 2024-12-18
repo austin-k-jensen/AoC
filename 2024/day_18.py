@@ -43,7 +43,7 @@ def parse(data):
     return blocks
 
 
-def part_1(blocks: list, size: int, byte_cnt: int):
+def path(blocks: list, size: int, byte_cnt: int):
     blocks = set(blocks[:byte_cnt])
     start, end = (0, 0), (size, size)
     dirs = [(0, 1), (0, -1), (1, 0), (-1, 0)]
@@ -74,11 +74,23 @@ def part_1(blocks: list, size: int, byte_cnt: int):
 
 
 @timing
+def part_1(blocks: list, size: int, byte_cnt: int):
+    return path(blocks=blocks, size=size, byte_cnt=byte_cnt)
+
+
+@timing
 def part_2(blocks: list, size: int, start_byte: int):
-    for block in range(start_byte, len(blocks)):
-        steps = part_1(blocks=blocks, size=size, byte_cnt=block + 1)
-        if not steps:
-            return blocks[block]
+    start, end = start_byte, len(blocks)
+
+    while end - start > 1:
+        block = start + (end - start) // 2
+
+        if path(blocks=blocks, size=size, byte_cnt=block):
+            start = block
+        else:
+            end = block
+
+    return blocks[block - 1]
 
 
 # part_1(blocks=parse(TEST_1), size=6, byte_cnt=12)
