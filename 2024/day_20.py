@@ -27,7 +27,7 @@ TEST_1 = """
 def parse(data: str):
     rows = data.strip().split()
     path = set()
-    walls = set()
+
     for i, row in enumerate(rows):
         for j, typ in enumerate(row):
             if typ == "S":
@@ -38,13 +38,12 @@ def parse(data: str):
                 path.add((i, j))
             elif typ == ".":
                 path.add((i, j))
-            elif typ == "#":
-                walls.add((i, j))
-    return start, end, path, walls
+
+    return start, end, path
 
 
 @timing
-def part_1(start: tuple, end: tuple, path: set, walls: set):
+def get_times(start: tuple, end: tuple, path: set):
     dirs = [(0, 1), (0, -1), (1, 0), (-1, 0)]
 
     path_times = {start: 0}
@@ -65,29 +64,15 @@ def part_1(start: tuple, end: tuple, path: set, walls: set):
                 path_times[new_loc] = path_times[loc] + 1
                 check.append(new_loc)
 
-    savings = []
-    for spot in path:
-        for dir_1 in dirs:
-            check_loc = (spot[0] + dir_1[0], spot[1] + dir_1[1])
-            if check_loc in walls:
-                for dir_2 in dirs:
-                    new_loc = (check_loc[0] + dir_2[0], check_loc[1] + dir_2[1])
-                    if new_loc in path:
-                        if path_times[new_loc] - path_times[spot] - 2 > 0:
-                            savings.append(path_times[new_loc] - path_times[spot] - 2)
-
-    large_savings = [x for x in savings if x >= 100]
-    return path_times, len(large_savings)
+    return path_times
 
 
 @timing
-def part_2(path_times: dict):
+def part_2(path_times: dict, steps: int):
     savings_dict = {}
     dirs = [(1, 1), (-1, -1), (1, -1), (-1, 1)]
 
     for loc in path_times:
-        steps = 20
-
         for dx in range(steps + 1):
             for dy in range(steps + 1 - dx):
                 dist = dx + dy
@@ -109,7 +94,7 @@ def part_2(path_times: dict):
     return len(large_savings)
 
 
-start, end, path, walls = parse(puzzle)
-path_times, part_1_ans = part_1(start, end, path, walls)
-print("part 1: ", part_1_ans)
-print("part 2: ", part_2(path_times))
+start, end, path = parse(puzzle)
+path_times = get_times(start, end, path)
+print("part 1: ", part_2(path_times, 2))
+print("part 2: ", part_2(path_times, 20))
