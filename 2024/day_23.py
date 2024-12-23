@@ -1,3 +1,4 @@
+import networkx as nx
 from aocd import get_data
 from utils import timing
 
@@ -55,6 +56,15 @@ def parse(data: str):
     return graph
 
 
+def create_graph(data: str):
+    G = nx.Graph()
+    for edge in data.strip().splitlines():
+        n1, n2 = edge.split("-")
+        G.add_edge(n1, n2)
+
+    return G
+
+
 @timing
 def part_1(graph: dict):
     groups = set()
@@ -71,5 +81,17 @@ def part_1(graph: dict):
     print(len(groups))
 
 
-graph = parse(puzzle)
-part_1(graph)
+def part_2(graph: nx.graph):
+
+    best = 0
+    for clq in nx.clique.find_cliques(graph):
+        if len(clq) > best:
+            out = clq
+            best = len(clq)
+    return ",".join(sorted(out))
+
+
+# graph = parse(puzzle)
+# part_1(graph)
+graph = create_graph(puzzle)
+print(part_2(graph))
