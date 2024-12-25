@@ -98,15 +98,18 @@ def parse(data: str):
         wires[start[:3]] = int(start[5])
 
     gates = []
+    gate_deps = {}
     for gate in block.splitlines():
         wire_1, opp, wire_2, _, wire_3 = gate.split()
         gates.append(((wire_1, wire_2), opp, wire_3))
 
+        gate_deps[wire_3] = [wire_1, wire_2]
+    print(gate_deps)
+
     return wires, gates
 
 
-@timing
-def part_1(wires: dict, gates: list):
+def run_program(wires: dict, gates: list):
 
     to_process = gates
 
@@ -125,6 +128,11 @@ def part_1(wires: dict, gates: list):
         else:
             to_process.append(gate)
 
+    return wires
+
+
+@timing
+def part_1(wires: dict):
     out_wires = []
     for wire, value in wires.items():
         if wire[0] == "z":
@@ -137,21 +145,46 @@ def part_1(wires: dict, gates: list):
     return int(str(bin_out), 2)
 
 
-# def part_2(wires: dict, gates: list)
-#         out_wires = []
-#     for wire, value in wires.items():
-#         if wire[0] == "z":
-#             out_wires.append((wire, value))
+def part_2(wires: dict, gates: list):
+    wires = run_program(wires, gates)
+
+    x_wires = []
+    y_wires = []
+    z_wires = []
+    for wire, value in wires.items():
+        if wire[0] == "x":
+            x_wires.append((wire, value))
+        if wire[0] == "y":
+            y_wires.append((wire, value))
+        if wire[0] == "z":
+            z_wires.append((wire, value))
+
+    # print(x_wires, y_wires, z_wires)
+
+    x_bin = 0
+    for i, (wire, value) in enumerate(sorted(x_wires)):
+        x_bin += value * 10**i
+    y_bin = 0
+    for i, (wire, value) in enumerate(sorted(y_wires)):
+        y_bin += value * 10**i
+    z_bin = 0
+    for i, (wire, value) in enumerate(sorted(z_wires)):
+        z_bin += value * 10**i
+
+    x_val = int(str(x_bin), 2)
+    y_val = int(str(y_bin), 2)
+    z_val = int(str(z_bin), 2)
+    print(f"{x_val} + {y_val} = {z_val}: {x_val+y_val==z_val}")
 
 
 wires, gates = parse(puzzle)
-print(part_1(wires, gates))
+# print(part_1(run_program(wires, gates)))
 wires = {
     "x00": 1,
-    "x01": 0,
-    "x02": 0,
-    "x03": 0,
-    "x04": 0,
+    "x01": 1,
+    "x02": 1,
+    "x03": 1,
+    "x04": 1,
     "x05": 0,
     "x06": 0,
     "x07": 0,
@@ -193,10 +226,10 @@ wires = {
     "x43": 0,
     "x44": 0,
     "y00": 1,
-    "y01": 0,
-    "y02": 0,
-    "y03": 0,
-    "y04": 0,
+    "y01": 1,
+    "y02": 1,
+    "y03": 1,
+    "y04": 1,
     "y05": 0,
     "y06": 0,
     "y07": 0,
@@ -238,3 +271,4 @@ wires = {
     "y43": 0,
     "y44": 0,
 }
+part_2(wires, gates)
