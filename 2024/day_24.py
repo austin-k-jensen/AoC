@@ -97,33 +97,50 @@ def parse(data: str):
     for start in starts.splitlines():
         wires[start[:3]] = int(start[5])
 
-    gates = []
+    gates = {}
     gate_deps = {}
     for gate in block.splitlines():
         wire_1, opp, wire_2, _, wire_3 = gate.split()
-        gates.append(((wire_1, wire_2), opp, wire_3))
+        gates[wire_3] = ((wire_1, wire_2), opp)
 
         gate_deps[wire_3] = [wire_1, wire_2]
-    print(gate_deps)
 
-    return wires, gates
+    for gate in gate_deps:
+        # print(gate, gate_deps[gate])
+        check = gate_deps[gate].copy()
+
+        depth = 0
+        while check and depth < 10:
+            new = check.pop()
+            if new in gate_deps:
+                # print("\t", gate_deps[new])
+                for to_add in gate_deps[new]:
+                    if not to_add in gate_deps[gate]:
+                        check.append(to_add)
+                        gate_deps[gate].append(to_add)
+            depth += 1
+
+    # print(gates)
+
+    return wires, gates, gate_deps
 
 
-def run_program(wires: dict, gates: list):
+def run_program(wires: dict, gates: dict):
 
-    to_process = gates
+    to_process = list(gates.keys())
+    # print(to_process)
 
     while to_process:
         gate = to_process.pop(0)
-        (wire_1, wire_2), opp, out_wire = gate
+        (wire_1, wire_2), opp = gates[gate]
 
         if wire_1 in wires and wire_2 in wires:
             if opp == "AND":
-                wires[out_wire] = wires[wire_1] and wires[wire_2]
+                wires[gate] = wires[wire_1] and wires[wire_2]
             if opp == "OR":
-                wires[out_wire] = wires[wire_1] or wires[wire_2]
+                wires[gate] = wires[wire_1] or wires[wire_2]
             if opp == "XOR":
-                wires[out_wire] = wires[wire_1] ^ wires[wire_2]
+                wires[gate] = wires[wire_1] ^ wires[wire_2]
 
         else:
             to_process.append(gate)
@@ -146,129 +163,63 @@ def part_1(wires: dict):
 
 
 def part_2(wires: dict, gates: list):
-    wires = run_program(wires, gates)
 
-    x_wires = []
-    y_wires = []
-    z_wires = []
-    for wire, value in wires.items():
-        if wire[0] == "x":
-            x_wires.append((wire, value))
-        if wire[0] == "y":
-            y_wires.append((wire, value))
-        if wire[0] == "z":
-            z_wires.append((wire, value))
+    safe_gates = set()
+    for i in range(5):
+        test_wires = {}
+        for j in range(45):
+            if j <= i:
+                test_wires[f"x{j:02}"] = 1
+                test_wires[f"y{j:02}"] = 1
+            else:
+                test_wires[f"x{j:02}"] = 0
+                test_wires[f"y{j:02}"] = 0
 
-    # print(x_wires, y_wires, z_wires)
+        # print(test_wires)
 
-    x_bin = 0
-    for i, (wire, value) in enumerate(sorted(x_wires)):
-        x_bin += value * 10**i
-    y_bin = 0
-    for i, (wire, value) in enumerate(sorted(y_wires)):
-        y_bin += value * 10**i
-    z_bin = 0
-    for i, (wire, value) in enumerate(sorted(z_wires)):
-        z_bin += value * 10**i
+        test_wires = run_program(test_wires, gates)
 
-    x_val = int(str(x_bin), 2)
-    y_val = int(str(y_bin), 2)
-    z_val = int(str(z_bin), 2)
-    print(f"{x_val} + {y_val} = {z_val}: {x_val+y_val==z_val}")
+        # print(test_wires)
+
+        x_wires = []
+        y_wires = []
+        z_wires = []
+        for wire, value in test_wires.items():
+            if wire[0] == "x":
+                x_wires.append((wire, value))
+            if wire[0] == "y":
+                y_wires.append((wire, value))
+            if wire[0] == "z":
+                z_wires.append((wire, value))
+
+        x_bin = 0
+        for n, (wire, value) in enumerate(sorted(x_wires)):
+            x_bin += value * 10**n
+        y_bin = 0
+        for n, (wire, value) in enumerate(sorted(y_wires)):
+            y_bin += value * 10**n
+        z_bin = 0
+        for n, (wire, value) in enumerate(sorted(z_wires)):
+            z_bin += value * 10**n
+
+        x_val = int(str(x_bin), 2)
+        y_val = int(str(y_bin), 2)
+        z_val = int(str(z_bin), 2)
+        print(f"{x_val} + {y_val} = {z_val}: {x_val+y_val==z_val}")
+
+        if x_val + y_val == z_val:
+            print(f"z{i:02}")
+            safe_gates.update(gate_deps[f"z{i:02}"])
+        else:
+            print(f"z{i:02}")
+            to_check = []
+            for gate in gate_deps[f"z{i:02}"]:
+                if gate not in safe_gates:
+                    to_check.append(gate)
+            print(to_check)
+    print(safe_gates)
 
 
-wires, gates = parse(puzzle)
+wires, gates, gate_deps = parse(puzzle)
 # print(part_1(run_program(wires, gates)))
-wires = {
-    "x00": 1,
-    "x01": 1,
-    "x02": 1,
-    "x03": 1,
-    "x04": 1,
-    "x05": 0,
-    "x06": 0,
-    "x07": 0,
-    "x08": 0,
-    "x09": 0,
-    "x10": 0,
-    "x11": 0,
-    "x12": 0,
-    "x13": 0,
-    "x14": 0,
-    "x15": 0,
-    "x16": 0,
-    "x17": 0,
-    "x18": 0,
-    "x19": 0,
-    "x20": 0,
-    "x21": 0,
-    "x22": 0,
-    "x23": 0,
-    "x24": 0,
-    "x25": 0,
-    "x26": 0,
-    "x27": 0,
-    "x28": 0,
-    "x29": 0,
-    "x30": 0,
-    "x31": 0,
-    "x32": 0,
-    "x33": 0,
-    "x34": 0,
-    "x35": 0,
-    "x36": 0,
-    "x37": 0,
-    "x38": 0,
-    "x39": 0,
-    "x40": 0,
-    "x41": 0,
-    "x42": 0,
-    "x43": 0,
-    "x44": 0,
-    "y00": 1,
-    "y01": 1,
-    "y02": 1,
-    "y03": 1,
-    "y04": 1,
-    "y05": 0,
-    "y06": 0,
-    "y07": 0,
-    "y08": 0,
-    "y09": 0,
-    "y10": 0,
-    "y11": 0,
-    "y12": 0,
-    "y13": 0,
-    "y14": 0,
-    "y15": 0,
-    "y16": 0,
-    "y17": 0,
-    "y18": 0,
-    "y19": 0,
-    "y20": 0,
-    "y21": 0,
-    "y22": 0,
-    "y23": 0,
-    "y24": 0,
-    "y25": 0,
-    "y26": 0,
-    "y27": 0,
-    "y28": 0,
-    "y29": 0,
-    "y30": 0,
-    "y31": 0,
-    "y32": 0,
-    "y33": 0,
-    "y34": 0,
-    "y35": 0,
-    "y36": 0,
-    "y37": 0,
-    "y38": 0,
-    "y39": 0,
-    "y40": 0,
-    "y41": 0,
-    "y42": 0,
-    "y43": 0,
-    "y44": 0,
-}
 part_2(wires, gates)
