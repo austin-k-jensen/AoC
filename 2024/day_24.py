@@ -165,7 +165,16 @@ def part_1(wires: dict):
 def part_2(wires: dict, gates: list):
 
     safe_gates = set()
-    for i in range(5):
+
+    # Found by manually parsing the input in 2024/day_24.txt
+    gates["hdt"], gates["z05"] = gates["z05"], gates["hdt"]
+    gates["gbf"], gates["z09"] = gates["z09"], gates["gbf"]
+    gates["mht"], gates["jgt"] = gates["jgt"], gates["mht"]
+    gates["nbf"], gates["z30"] = gates["z30"], gates["nbf"]
+
+    swaps = ["hdt", "z05", "gbf", "z09", "mht", "jgt", "nbf", "z30"]
+
+    for i in range(45):
         test_wires = {}
         for j in range(45):
             if j <= i:
@@ -205,21 +214,24 @@ def part_2(wires: dict, gates: list):
         x_val = int(str(x_bin), 2)
         y_val = int(str(y_bin), 2)
         z_val = int(str(z_bin), 2)
-        print(f"{x_val} + {y_val} = {z_val}: {x_val+y_val==z_val}")
+
+        # print(f"z{i:02}: {x_val} + {y_val} = {z_val}: {x_val+y_val==z_val}")
 
         if x_val + y_val == z_val:
-            print(f"z{i:02}")
+            # print(f"z{i:02}")
             safe_gates.update(gate_deps[f"z{i:02}"])
         else:
-            print(f"z{i:02}")
+            # print(f"z{i:02}")
             to_check = []
             for gate in gate_deps[f"z{i:02}"]:
                 if gate not in safe_gates:
                     to_check.append(gate)
-            print(to_check)
-    print(safe_gates)
+            # print(to_check)
+    # print(safe_gates)
+
+    return ",".join(sorted(swaps))
 
 
 wires, gates, gate_deps = parse(puzzle)
-# print(part_1(run_program(wires, gates)))
-part_2(wires, gates)
+print("part 1: ", part_1(run_program(wires, gates)))
+print("part 2: ", part_2(wires, gates))
