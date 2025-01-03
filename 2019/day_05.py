@@ -13,6 +13,13 @@ TEST_6 = "1002,4,3,4,33"
 TEST_7 = "1101,100,-1,4,0"
 TEST_8 = "3,0,4,0,99"
 TEST_9 = "3,225,1,225,6,6,1100,1,238,225,104,0,99"
+TEST_10 = "3,9,8,9,10,9,4,9,99,-1,8"
+TEST_11 = "3,9,7,9,10,9,4,9,99,-1,8"
+TEST_12 = "3,3,1108,-1,8,3,4,3,99"
+TEST_13 = "3,3,1107,-1,8,3,4,3,99"
+TEST_14 = "3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9"
+TEST_15 = "3,3,1105,-1,9,1101,0,0,12,4,12,99,1"
+TEST_16 = "3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99"
 
 
 def parse(data: str):
@@ -75,6 +82,58 @@ def op_4(memory: defaultdict, address: int, param_1_mode: int):
     return address
 
 
+def op_5(memory: defaultdict, address: int, param_1_mode: int, param_2_mode: int):
+    param_1 = get_param(memory, address, param_1_mode, 1)
+    param_2 = get_param(memory, address, param_2_mode, 2)
+    if param_1 != 0:
+        address = param_2
+    else:
+        address += 3
+
+    return address
+
+
+def op_6(memory: defaultdict, address: int, param_1_mode: int, param_2_mode: int):
+    param_1 = get_param(memory, address, param_1_mode, 1)
+    param_2 = get_param(memory, address, param_2_mode, 2)
+    if param_1 == 0:
+        address = param_2
+    else:
+        address += 3
+
+    return address
+
+
+def op_7(memory: defaultdict, address: int, param_1_mode: int, param_2_mode: int):
+    param_1 = get_param(memory, address, param_1_mode, 1)
+    param_2 = get_param(memory, address, param_2_mode, 2)
+
+    if param_1 < param_2:
+        out = 1
+    else:
+        out = 0
+
+    memory[memory[address + 3]] = out
+    address += 4
+
+    return memory, address
+
+
+def op_8(memory: defaultdict, address: int, param_1_mode: int, param_2_mode: int):
+    param_1 = get_param(memory, address, param_1_mode, 1)
+    param_2 = get_param(memory, address, param_2_mode, 2)
+
+    if param_1 == param_2:
+        out = 1
+    else:
+        out = 0
+
+    memory[memory[address + 3]] = out
+    address += 4
+
+    return memory, address
+
+
 def run_program(program: defaultdict, input: int = 0):
     address = 0
     memory = program.copy()
@@ -95,6 +154,14 @@ def run_program(program: defaultdict, input: int = 0):
             memory, address = op_3(memory, address, input)
         elif op_code == 4:
             address = op_4(memory, address, param_1_mode)
+        elif op_code == 5:
+            address = op_5(memory, address, param_1_mode, param_2_mode)
+        elif op_code == 6:
+            address = op_6(memory, address, param_1_mode, param_2_mode)
+        elif op_code == 7:
+            memory, address = op_7(memory, address, param_1_mode, param_2_mode)
+        elif op_code == 8:
+            memory, address = op_8(memory, address, param_1_mode, param_2_mode)
         else:
             print("error")
             break
@@ -106,3 +173,4 @@ def run_program(program: defaultdict, input: int = 0):
 program = parse(puzzle)
 # print(program)
 run_program(program, 1)
+run_program(program, 5)
