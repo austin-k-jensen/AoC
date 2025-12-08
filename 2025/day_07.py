@@ -30,24 +30,26 @@ def parse(data: str) -> dict:
     for i, row in enumerate(rows):
         for j, typ in enumerate(row):
             if typ == "S":
+                start = (i, j)
                 grid[(i, j)] = "|"
             else:
                 grid[(i, j)] = typ
-    return grid
+    return grid, start
 
 
-def part_1(grid: dict) -> int:
+def day_7(grid: dict, start: tuple) -> int:
 
     row_max, col_max = max(grid)
     split_cnt = 0
+    time_cnt = 0
 
     block_cnt = defaultdict(int)
-    block_cnt[(0, 7)] = 1
+    block_cnt[start] = 1
 
     for row in range(row_max):
         for col in range(col_max + 1):
             if grid[(row, col)] == "|":
-                if grid[(row + 1, col)] == ".":
+                if grid[(row + 1, col)] == "." or grid[(row + 1, col)] == "|":
                     grid[(row + 1, col)] = "|"
                     block_cnt[(row + 1, col)] += block_cnt[(row, col)]
                 elif grid[(row + 1, col)] == "^":
@@ -56,16 +58,13 @@ def part_1(grid: dict) -> int:
                     grid[(row + 1, col + 1)] = "|"
                     block_cnt[(row + 1, col - 1)] += block_cnt[(row, col)]
                     block_cnt[(row + 1, col + 1)] += block_cnt[(row, col)]
-    print(block_cnt)
+            if row == row_max - 1:
+                time_cnt += block_cnt[(row, col)]
 
-    print(split_cnt)
-
-    # for row in range(row_max + 1):
-    #     out = ""
-    #     for col in range(col_max + 1):
-    #         out += grid[(row, col)]
-    #     print(out)
+    return split_cnt, time_cnt
 
 
-grid = parse(TEST_1)
-part_1(grid)
+grid, start = parse(puzzle)
+part_1, part_2 = day_7(grid, start)
+print("part 1: ", part_1)
+print("part 2: ", part_2)
