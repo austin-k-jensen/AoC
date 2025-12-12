@@ -1,3 +1,4 @@
+from functools import cache
 from aocd import get_data
 
 YEAR, DAY = 2025, 11
@@ -33,57 +34,41 @@ hhh: out
 """
 
 
-def parse(data: str):
+def part_2(data: str):
+
     devices = {}
     for device in data.strip().splitlines():
         device, cons = device.split(": ")[0], device.split(": ")[1].split()
         devices[device] = cons
 
-    return devices
-
-
-def part_1(devices: dict) -> int:
-
-    start = "you"
-    check = [start]
-    paths = 0
-
-    while check:
-        loc = check.pop()
+    @cache
+    def count_paths(loc: str, end: str):
+        paths = 0
+        if loc == end:
+            return 1
         if loc == "out":
-            paths += 1
-            continue
-        check += devices[loc]
+            return 0
+        else:
+            for next_loc in devices[loc]:
+                paths += count_paths(next_loc, end)
 
-    return paths
+        return paths
 
+    part_1 = count_paths("you", "out")
 
-def part_2(devices: dict):
+    part_2 = (
+        count_paths("svr", "fft")
+        * count_paths("fft", "dac")
+        * count_paths("dac", "out")
+    ) + (
+        count_paths("svr", "dac")
+        * count_paths("dac", "fft")
+        * count_paths("fft", "out")
+    )
 
-    start = "svr"
-    check = [[start]]
-    paths = 0
-
-    while check:
-        path = check.pop()
-        loc = path[-1]
-        # print(path)
-
-        if loc == "out":
-            if "fft" in path and "dac" in path:
-                print(path)
-                paths += 1
-            continue
-
-        for next_loc in devices[loc]:
-            if next_loc in path:
-                print("hmm")
-            next_path = path + [next_loc]
-            check.append(next_path)
-
-    print(paths)
+    return part_1, part_2
 
 
-devices = parse(puzzle)
-# print("part 1: ", part_1(devices))
-part_2(devices)
+a1, a2 = part_2(puzzle)
+print("part 1: ", a1)
+print("part 2: ", a2)
